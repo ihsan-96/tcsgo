@@ -1,0 +1,14 @@
+<h1>My Groups</h1>
+{% if groups_list %}
+    <ul>
+    {% for group in groups_list %}
+        {% if user_id == group.owner_id %}
+            <li><a href="/rides/{{ group.id }}/owner">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
+        {% else %}
+            <li><a href="/rides/{{ group.id }}/member">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no groups.</p>
+{% endif %}

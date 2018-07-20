@@ -2,23 +2,33 @@ from django.http import HttpResponse
 
 from django.db.models import Q
 
+from django.shortcuts import render
+
 from .models import GroupsHistory
 
 from .models import Groups
 
+from .models import Cars
+
 
 def index(request):
     return HttpResponse("You're looking at index view of rider")
+    #This the Index of Rider. Currently nothing is here
 
 def groups(request, user_id):
-    groups_list = GroupsHistory.objects.filter(members__id=user_id).order_by('-date')
-    output = ', '.join([g.owner.last_name for g in groups_list])
-    return HttpResponse(output)
+    groups_list = GroupsHistory.objects.filter( Q(members__id=user_id) | Q(owner_id=user_id) ).order_by('-date').distinct()
+    context = {
+    'groups_list' : groups_list,
+    'user_id' : user_id
+    }
+    return render(request, 'rides/groups.html', context)
     #This is the my groups page.
 
 
 def group_member(request, group_id):
-    return HttpResponse("You're looking at group as member%s." % group_id)
+    context = {
+    group = Groups.objects.get(id = group_id)
+    }
     #This is the group expansion for group member.
 
 
