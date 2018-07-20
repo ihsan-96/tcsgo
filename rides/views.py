@@ -1,14 +1,10 @@
 from django.http import HttpResponse
 
-from django.db.models import Q
+from django.db.models import Q #, Count (if you are using Count() function in group_member)
 
 from django.shortcuts import render
 
-from .models import GroupsHistory
-
-from .models import Groups
-
-from .models import Cars
+from .models import GroupsHistory, Car, GroupHistory, Points, Membership
 
 
 def index(request):
@@ -26,9 +22,32 @@ def groups(request, user_id):
 
 
 def group_member(request, group_id):
-    context = {
     group = Groups.objects.get(id = group_id)
+    points = Points.objects.all()
+    available_seats_trip1 = group.seats_offered - Membership.objects.filter(group_id=group_id).filter(trip_type=1).count()
+    available_seats_trip2 = group.seats_offered - Membership.objects.filter(group_id=group_id).filter(trip_type=2).count()
+    trip1_members = Membership.objects.filter(group_id=group_id).filter(trip_type=1)
+    trip2_members = Membership.objects.filter(group_id=group_id).filter(trip_type=2)
+    if group.start_point == 1 and end_point == 1
+        ride_status = 'No rides available'
+    else
+        if group.start_point != 1 and end_point != 1
+            ride_status = "Both rides available"
+        else
+            if group.start_point == 1
+                ride_status = 'Return ride available'
+            else
+                ride_status = 'Enroute ride available'
+    context = {'group' : group,
+    'ride_status' : ride_status,
+    'points' : points,
+    'available_seats_trip1' : available_seats_trip1,
+    'available_seats_trip2' : available_seats_trip2,
+    'trip1_members' : trip1_members,
+    'trip2_members' : trip2_members,
     }
+
+    return render(request, 'rides/group_member.html', context)
     #This is the group expansion for group member.
 
 
