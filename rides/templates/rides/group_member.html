@@ -1,33 +1,36 @@
-<h1>{{ group.owner.first_name }} {{ group.owner.last_name }}</h1>
-<br/>
-<h2>{{ group.car.car_name }}
+<h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
+<h3>{{ group.car.car_name }}
 <br/>
 {{ group.car_number }}
-</h2>
+</h3>
 <br/>
 <br/>
-<h3>Available rides</h3> : {{ ride_status }}
+<b>Available rides :</b> {{ ride_status }}
+<br/>
 <br/>
 <form action="{% url 'rides:request_ride' group.id %}" method="post">
     {% csrf_token %}
-    Request Point
+
+    <b>Request Point</b>
     <select name="request_point">
     {% for point in points %}
         <option value="{{ point.id }}">{{ point.point_name }}</option>
     {% endfor %}
     </select>
-    <br/>
 
+    <br/>
+    <br/>
+    <b>Select Ride : </b>
     <input type="radio" name="trip_type" id="trip1" value="trip1" />
-    <label for="trip1">Enroute</label><br />
+    <label for="trip1">Enroute</label>
 
     <input type="radio" name="trip_type" id="trip2" value="trip2" />
-    <label for="trip2">return</label><br />
+    <label for="trip2">return</label><br/>
 
     <br/>
-    <h3>Available Seats Enroute</h3> : {{ available_seats_trip1 }}
+    <b>Available Seats Enroute</b> : {{ available_seats_trip1 }}
     <br/>
-    <h3>You are pooling with :</h3>
+    <b>You are pooling with :</b>
     <br/>
     {% for member in trip1_members %}
         {{member.user.first_name}} {{ member.user.last_name }}
@@ -35,9 +38,9 @@
     {% endfor %}
     <br/>
 
-    <h3>Available Seats Return</h3> : {{ available_seats_trip2 }}
+    <b>Available Seats Return</b> : {{ available_seats_trip2 }}
     <br/>
-    <h3>You are pooling with :</h3><br/>
+    <b>You are pooling with :</b><br/>
     <br/>
     {% for member in trip2_members %}
         {{member.user.first_name}} {{ member.user.last_name }}

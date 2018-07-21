@@ -1,5 +1,7 @@
 from django.db import models
 
+from django.contrib import admin
+
 sex_choices = (
     ('1','male'),
     ('2','female'),
@@ -66,8 +68,8 @@ pay_status_choices =(
 class Groups(models.Model):
     owner = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='owner')
     car = models.ForeignKey(Cars, on_delete=models.CASCADE)
-    start_point = models.ForeignKey(Points, on_delete=models.CASCADE, default='1', related_name='start_point')
-    end_point = models.ForeignKey(Points, on_delete=models.CASCADE, default='1', related_name='end_point')
+    start_point = models.ForeignKey(Points, on_delete=models.CASCADE, default=1, related_name='start_point')
+    end_point = models.ForeignKey(Points, on_delete=models.CASCADE, default=1, related_name='end_point')
     trip1_intermediate_points = models.ManyToManyField(Points, related_name='trip1_intermediate_points')
     trip2_intermediate_points = models.ManyToManyField(Points, related_name='trip2_intermediate_points')
     seats_offered = models.IntegerField(choices=seats_offered_choices, default=3)
@@ -123,3 +125,16 @@ class GroupsHistory(models.Model):
     pay_status = models.CharField(max_length=10)
     members = models.ManyToManyField(Users)
     date = models.DateField(auto_now=True)
+
+
+class MembershipInline(admin.TabularInline):
+    model = Membership
+    extra = 1
+
+
+class UsersAdmin(admin.ModelAdmin):
+    inlines = (MembershipInline,)
+
+
+class GroupsAdmin(admin.ModelAdmin):
+    inlines = (MembershipInline,)

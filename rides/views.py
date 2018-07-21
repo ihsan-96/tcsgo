@@ -1,10 +1,10 @@
 from django.http import HttpResponse
 
-from django.db.models import Q #, Count (if you are using Count() function in group_member)
+from django.db.models import Q
 
 from django.shortcuts import render
 
-from .models import GroupsHistory, Car, GroupHistory, Points, Membership
+from .models import GroupsHistory, Cars, Points, Membership, Groups
 
 
 def index(request):
@@ -28,15 +28,15 @@ def group_member(request, group_id):
     available_seats_trip2 = group.seats_offered - Membership.objects.filter(group_id=group_id).filter(trip_type=2).count()
     trip1_members = Membership.objects.filter(group_id=group_id).filter(trip_type=1)
     trip2_members = Membership.objects.filter(group_id=group_id).filter(trip_type=2)
-    if group.start_point == 1 and end_point == 1
+    if group.start_point == 1 and group.end_point == 1 :
         ride_status = 'No rides available'
-    else
-        if group.start_point != 1 and end_point != 1
+    else :
+        if group.start_point != 1 and group.end_point != 1 :
             ride_status = "Both rides available"
-        else
-            if group.start_point == 1
+        else :
+            if group.start_point == 1 :
                 ride_status = 'Return ride available'
-            else
+            else :
                 ride_status = 'Enroute ride available'
     context = {'group' : group,
     'ride_status' : ride_status,
