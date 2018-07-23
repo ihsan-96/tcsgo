@@ -80,7 +80,6 @@ def group_member(request, group_id, user_id):
 
 
 def request_ride(request, group_id, user_id):
-    print(request)
     group = Groups.objects.get(id = group_id)
     if request.method == 'POST':
         if 'cancel' in request.POST :
