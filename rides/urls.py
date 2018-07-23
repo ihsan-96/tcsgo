@@ -12,10 +12,10 @@ urlpatterns = [
     path('<int:user_id>/', views.groups, name='groups'),
 
     # ex: /rides/5/member
-    path('<int:group_id>/member', views.group_member, name='group_member'),
+    path('<int:group_id>/member/<int:user_id>', views.group_member, name='group_member'),
 
     # ex: /rides/5/member/request_ride/
-    path('<int:group_id>/member/request_ride', views.request_ride, name='request_ride'),
+    path('<int:group_id>/member/<int:user_id>/request_ride', views.request_ride, name='request_ride'),
 
     # ex: /rides/5/owner
     path('<int:group_id>/owner', views.group_owner, name='group_owner'),

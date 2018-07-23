@@ -2,9 +2,11 @@ from django.http import HttpResponse
 
 from django.db.models import Q
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
-from .models import GroupsHistory, Cars, Points, Membership, Groups
+from .models import GroupsHistory, Cars, Points, Membership, Groups, Requests
+
+from .forms import GroupMemberForm
 
 
 def index(request):
@@ -12,48 +14,96 @@ def index(request):
     #This the Index of Rider. Currently nothing is here
 
 def groups(request, user_id):
-    groups_list = GroupsHistory.objects.filter( Q(members__id=user_id) | Q(owner_id=user_id) ).order_by('-date').distinct()
+    groups_history_list = GroupsHistory.objects.filter( members__id=user_id ).order_by('-date').distinct()
+    groups_owner_list = Groups.objects.filter( owner_id=user_id ).distinct()
     context = {
-    'groups_list' : groups_list,
+    'groups_history_list' : groups_history_list,
+    'groups_owner_list' : groups_owner_list,
     'user_id' : user_id
     }
     return render(request, 'rides/groups.html', context)
     #This is the my groups page.
 
 
-def group_member(request, group_id):
+
+def group_member(request, group_id, user_id):
+
+    if request.method == 'POST':
+        if 'delete_request' in request.POST:
+            r = Requests.objects.get(id = request.POST['request_id'])
+            r.delete()
+        if 'leave_trip' in request.POST:
+            if request.POST['member_id']:
+                m = Membership.objects.get(id = request.POST['member_id'])
+                m.delete()
+
     group = Groups.objects.get(id = group_id)
-    points = Points.objects.all()
-    available_seats_trip1 = group.seats_offered - Membership.objects.filter(group_id=group_id).filter(trip_type=1).count()
-    available_seats_trip2 = group.seats_offered - Membership.objects.filter(group_id=group_id).filter(trip_type=2).count()
+    requests = Requests.objects.filter(user_id = user_id)
     trip1_members = Membership.objects.filter(group_id=group_id).filter(trip_type=1)
     trip2_members = Membership.objects.filter(group_id=group_id).filter(trip_type=2)
-    if group.start_point == 1 and group.end_point == 1 :
-        ride_status = 'No rides available'
-    else :
-        if group.start_point != 1 and group.end_point != 1 :
-            ride_status = "Both rides available"
-        else :
-            if group.start_point == 1 :
-                ride_status = 'Return ride available'
-            else :
-                ride_status = 'Enroute ride available'
-    context = {'group' : group,
-    'ride_status' : ride_status,
-    'points' : points,
+    available_seats_trip1 = group.seats_offered - trip1_members.count()
+    available_seats_trip2 = group.seats_offered - trip2_members.count()
+    trip1_members_list=[i.user.id for i in trip1_members]
+    trip2_members_list=[i.user.id for i in trip2_members]
+    trip1_status = 'Available'
+    trip2_status = 'Available'
+
+
+    if group.start_point == 1 :
+        trip1_status = 'Not Available'
+    if available_seats_trip1 == 0 :
+        trip1_status = 'Not Available'
+
+    if group.end_point == 1 :
+        trip2_status = 'Not Available'
+    if available_seats_trip2 == 0 :
+        trip2_status = 'Not Available'
+
+
+    context = {
+    'requests' : requests,
+    'group' : group,
+    'user_id' : user_id,
+    'trip1_status' : trip1_status,
+    'trip2_status' : trip2_status,
     'available_seats_trip1' : available_seats_trip1,
     'available_seats_trip2' : available_seats_trip2,
     'trip1_members' : trip1_members,
     'trip2_members' : trip2_members,
+    'trip1_members_list' : trip1_members_list,
+    'trip2_members_list' : trip2_members_list
+    }
+    if request.method == 'POST':
+        return render(request, 'rides/group_member.html', context)
+    return render(request, 'rides/group_member.html', context)
+
+
+
+def request_ride(request, group_id, user_id):
+    group = Groups.objects.get(id = group_id)
+    if request.method == 'POST':
+        if 'cancel' in request.POST :
+            return redirect('rides:group_member',group_id,user_id)
+        else :
+            post_data = request.POST.copy()
+            post_data['group'] = group_id
+            post_data['user'] = user_id
+            form = GroupMemberForm(post_data)
+            if form.is_valid():
+                form.save()
+                return redirect('rides:group_member',group_id,user_id)
+            #else: print error messages for time too
+    form = GroupMemberForm()
+    context = {
+    'form' : form,
+    'group' : group,
     }
 
-    return render(request, 'rides/group_member.html', context)
-    #This is the group expansion for group member.
-
-
-def request_ride(request, group_id):
-    return HttpResponse("You're requesting group %s as member." % group_id)
+    return render(request, 'rides/request_ride.html', context)
     #This is the request ACTION in group expansion of group member
+
+
+
 
 
 def group_owner(request, group_id):

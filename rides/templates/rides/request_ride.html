@@ -1,0 +1,17 @@
+<h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
+<h3>{{ group.car.car_name }}</h3>
+<b>{{ group.car.car_number }}</b>
+<br/>
+<br/>
+
+<form method="post">
+    {% csrf_token %}
+    <pre><b>{{ form }}</b></pre>
+    <br/>
+    <br/>
+    <input type="submit" value="Request Ride" name="request"/>
+</form>
+<form method="post">
+    {% csrf_token %}
+    <input type="submit" value="Cancel" name="cancel"/>
+</form>

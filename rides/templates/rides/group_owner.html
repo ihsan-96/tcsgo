@@ -15,40 +15,22 @@
 <br/>
 <form action="{% url 'rides:configure_ride' group.id %}" method="post">
     {% csrf_token %}
-    Start Point
-    <select name="start_point">  <!--I Stopped here -->
+    <b>Start Point : </b>
+    <select name="start_point">
     {% for point in points %}
         <option value="{{ point.id }}">{{ point.point_name }}</option>
     {% endfor %}
     </select>
     <br/>
 
-    <input type="radio" name="trip_type" id="trip1" value="trip1" />
-    <label for="trip1">Enroute</label><br />
-
-    <input type="radio" name="trip_type" id="trip2" value="trip2" />
-    <label for="trip2">return</label><br />
-
-    <br/>
-    <h3>Available Seats Enroute</h3> : {{ available_seats_trip1 }}
-    <br/>
-    <h3>You are pooling with :</h3>
-    <br/>
-    {% for member in trip1_members %}
-        {{member.user.first_name}} {{ member.user.last_name }}
-        <br/>
+    <b>Seats offered : </b>
+    <select name="seats_offered">
+    {% for choice in choices in points %}
+        <option value="{{ choice }}">{{ choice }}</option>
     {% endfor %}
+    </select>
     <br/>
 
-    <h3>Available Seats Return</h3> : {{ available_seats_trip2 }}
-    <br/>
-    <h3>You are pooling with :</h3><br/>
-    <br/>
-    {% for member in trip2_members %}
-        {{member.user.first_name}} {{ member.user.last_name }}
-        <br/>
-    {% endfor %}
-    <br/>
 
     <input type="submit" value="Request Ride"  />
 </form>

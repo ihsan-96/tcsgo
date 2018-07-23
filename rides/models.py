@@ -62,7 +62,7 @@ seats_offered_choices = (
 
 pay_status_choices =(
     (0,'no pay'),
-    (1,'pay'),
+    (1,'paid'),
 )
 
 class Groups(models.Model):
@@ -92,8 +92,8 @@ request_status_choices = (
 
 
 trip_type_choices = (
-    (1,'trip1'),
-    (2,'trip2'),
+    (1,'Enroute'),
+    (2,'Return'),
 )
 
 
@@ -115,11 +115,11 @@ class Membership(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE)
     trip_type = models.IntegerField(choices=trip_type_choices)
+    entry_point = models.ForeignKey(Points, on_delete=models.CASCADE)
 
 
 class GroupsHistory(models.Model):
-    owner = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='owner_history')
-    car = models.ForeignKey(Cars, on_delete=models.CASCADE)
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE)
     source = models.ForeignKey(Points, on_delete=models.CASCADE, related_name='source')
     destination = models.ForeignKey(Points, on_delete=models.CASCADE, related_name='destination')
     pay_status = models.CharField(max_length=10)

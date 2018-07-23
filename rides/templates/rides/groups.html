@@ -1,12 +1,12 @@
 <h1>My Groups</h1>
-{% if groups_list %}
+{% if groups_history_list or groups_owner_list %}
     <ul>
-    {% for group in groups_list %}
-        {% if user_id == group.owner_id %}
-            <li><a href="/rides/{{ group.id }}/owner">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
-        {% else %}
-            <li><a href="/rides/{{ group.id }}/member">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
-        {% endif %}
+    {% for group in groups_owner_list %}
+        <li><a href="/rides/{{ group.id }}/owner">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
+    {% endfor %}
+
+    {% for history in groups_history_list %}
+        <li><a href="{% url 'rides:group_member' history.group_id user_id %}">{{ history.group.owner.first_name }} {{ history.group.owner.last_name }} - {{ history.group.car.car_name }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
