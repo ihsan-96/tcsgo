@@ -80,6 +80,7 @@ def group_member(request, group_id, user_id):
 
 
 def request_ride(request, group_id, user_id):
+    print(request)
     group = Groups.objects.get(id = group_id)
     if request.method == 'POST':
         if 'cancel' in request.POST :
@@ -88,6 +89,8 @@ def request_ride(request, group_id, user_id):
             post_data = request.POST.copy()
             post_data['group'] = group_id
             post_data['user'] = user_id
+            if 'enroute' in request.POST :
+                post_data['trip_type'] = 1
             form = GroupMemberForm(post_data)
             if form.is_valid():
                 form.save()
