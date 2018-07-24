@@ -1,0 +1,45 @@
+<h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
+<b>{{ group.car.car_name }}</b>
+<br/>
+<b>{{ group.car.car_number }}</b>
+<br/><br/><br/><br/>
+<form method="post">
+    {% csrf_token %}
+    <b>{{ form.start_point.label }}</b> : {{ form.start_point }}
+    <br/>
+    {{ form.start_point.help_text }}
+    <br/><br/>
+    <b>{{ form.end_point.label }}</b> : {{ form.end_point }}
+    <br/>
+    {{ form.end_point.help_text }}
+    <br/><br/>
+    <b>{{ form.trip1_intermediate_points.label }}</b> : {{ form.trip1_intermediate_points }}
+    <br/>
+    {{ form.trip1_intermediate_points.help_text }}
+    <br/><br/>
+    <b>{{ form.trip2_intermediate_points.label }}</b> : {{ form.trip2_intermediate_points }}
+    <br/>
+    {{ form.trip2_intermediate_points.help_text }}
+    <br/><br/>
+    <b>{{ form.seats_offered.label }}</b> : {{ form.seats_offered }}
+    <br/>
+    {{ form.seats_offered.help_text }}
+    <br/><br/>
+    <b>{{ form.pay_status.label }}</b> : {{ form.pay_status }}
+    <br/>
+    {{ form.pay_status.help_text }}
+    <br/><br/>
+    <b>{{ form.trip1_time.label }}</b> : {{ form.trip1_time }}
+    <br/>
+    {{ form.trip1_time.help_text }}
+    <br/><br/>
+    <b>{{ form.trip2_time.label }}</b> : {{ form.trip2_time }}
+    <br/>
+    {{ form.trip2_time.help_text }}
+    <br/><br/>
+    <input type="submit" value="Configure Ride" name="configure_ride"/>
+</form>
+<form method="post">
+    {% csrf_token %}
+    <input type="submit" value="Cancel" name="cancel"/>
+</form>

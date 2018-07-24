@@ -1,36 +1,115 @@
-<h1>Your Group</h1>
+<h2>Your Group</h2>
+<b>{{ group.car.car_name }}</b>
 <br/>
-<h2>{{ group.car.car_name }}
+<b>{{ group.car.car_number }}</b>
 <br/>
-{{ group.car_number }}
-</h2>
-<br/>
-<br/>
+<h2>Your Requests</h2>
+{% if requests %}
+    {% for request in requests %}
+        <u><b>{{ forloop.counter }}.)</b>
+        {% if request.trip_type == 1 %}
+            <b>Enroute</b>
+        {% else %}
+            <b>Return</b>
+        {% endif %}
+        </u>
+        <br/>
+        <b>{{ request.user.first_name }} {{ request.user.last_name }}</b>
+        <br/>
+        <b>Requested Point : </b> {{ request.point.point_name }}
+        <br/>
+        <form method="post">
+            {% csrf_token %}
+            <input type='hidden' name="request_id" value="{{ request.id }}"/>
 
-<form action="{% url 'rides:manage_request' group.id %}">
-    <input type="submit" value="Requests" />
-</form>
+            {% if request.trip_type == 1 %}
+                {% if available_seats_trip1 != 0 %}
+                    <input type="submit" value="Accept" name='accept_request'/>
+                {% endif %}
+            {% else %}
+                {% if available_seats_trip2 != 0 %}
+                    <input type="submit" value="Accept" name='accept_request'/>
+                {% endif %}
+            {% endif %}
 
-<h3>Enroute</h3>
+            <input type="submit" value="Reject" name='reject_request'/>
+        </form>
+        <br/>
+    {% endfor %}
+{% else %}
+    <b>You dont have any requests for this group</b>
+{% endif %}
+
+<h2>Enroute</h2>
+<b>Ride Availability</b> : {{ trip1_status }}
 <br/>
+{% if trip1_status == 'Available' %}
+    <b>Starting Point</b> : {{ group.start_point.point_name }} <br/>
+    <b>Starting Time</b> : {{ group.trip1_time }} <br/>
+    <b>Payment Status</b> :
+    {% if group.pay_status == 0 %}
+        No Pay
+    {% else %}
+        paid
+    {% endif %}
+    <br/>
+    <b>Seats Offered</b> : {{ seats_offered }}
+    <br/>
+    <b>Seats Remaining</b> : {{ available_seats_trip1 }}
+    <br/>
+    {% if trip1_members %}
+        <b>Pool members :</b>
+        <br/>
+        {% for member in trip1_members %}
+            {{ forloop.counter }}. {{member.user.first_name}} {{ member.user.last_name }}
+            <br/>
+            <form method="post">
+                {% csrf_token %}
+                <input type='hidden' name="member_id" value="{{ member.id }}"/>
+                <input type="submit" value="Remove" name='remove_member'/>
+            </form>
+        {% endfor %}
+        <br/>
+    {% endif %}
+{% endif %}
 <form action="{% url 'rides:configure_ride' group.id %}" method="post">
     {% csrf_token %}
-    <b>Start Point : </b>
-    <select name="start_point">
-    {% for point in points %}
-        <option value="{{ point.id }}">{{ point.point_name }}</option>
-    {% endfor %}
-    </select>
+    <input type="submit" value="Configure"/>
+</form>
+
+<h2>Return</h2>
+<b>Ride Availability</b> : {{ trip2_status }}
+<br/>
+{% if trip2_status == 'Available' %}
+    <b>Destination</b> : {{ group.end_point.point_name }} <br/>
+    <b>Starting Time</b> : {{ group.trip2_time }} <br/>
+    <b>Payment Status</b> :
+    {% if group.pay_status == 0 %}
+        No Pay
+    {% else %}
+        paid
+    {% endif %}
     <br/>
-
-    <b>Seats offered : </b>
-    <select name="seats_offered">
-    {% for choice in choices in points %}
-        <option value="{{ choice }}">{{ choice }}</option>
-    {% endfor %}
-    </select>
+    <b>Seats Offered</b> : {{ seats_offered }}
     <br/>
-
-
-    <input type="submit" value="Request Ride"  />
+    <b>Seats Remaining</b> : {{ available_seats_trip2 }}
+    <br/>
+    {% if trip2_members %}
+        <b>Pool members :</b>
+        <br/>
+        {% for member in trip1_members %}
+            {{ forloop.counter }}. {{member.user.first_name}} {{ member.user.last_name }}
+            <br/>
+            <form method="post">
+                {% csrf_token %}
+                <input type='hidden' name="member_id" value="{{ member.id }}"/>
+                <input type="submit" value="Remove" name='remove_member'/>
+            </form>
+        {% endfor %}
+        <br/>
+    {% endif %}
+{% endif %}
+<form action="{% url 'rides:configure_ride' group.id %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Configure"/>
 </form>

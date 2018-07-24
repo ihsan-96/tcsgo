@@ -6,7 +6,14 @@
 
 <form method="post">
     {% csrf_token %}
-    <pre><b>{{ form }}</b></pre>
+    <b>{{ form.trip_type.label }}</b> : {{ form.trip_type }}
+    <br/>
+    {{ form.trip_type.help_text }}
+    <br/>
+    <br/>
+    <b>{{ form.point.label }}</b> : {{ form.point }}
+    <br/>
+    {{ form.point.help_text }}
     <br/>
     <br/>
     <input type="submit" value="Request Ride" name="request"/>

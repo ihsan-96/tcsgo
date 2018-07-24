@@ -38,7 +38,4 @@ urlpatterns = [
     # ex: /rides/add_ride/2
     path('add_ride/<int:user_id>', views.adding_ride, name='adding_ride'),
 
-    # ex: /rides/5/owner/manage_request/
-    path('<int:group_id>/owner/manage_request', views.manage_request, name='manage_request'),
-
 ]

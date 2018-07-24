@@ -70,12 +70,12 @@ class Groups(models.Model):
     car = models.ForeignKey(Cars, on_delete=models.CASCADE)
     start_point = models.ForeignKey(Points, on_delete=models.CASCADE, default=1, related_name='start_point')
     end_point = models.ForeignKey(Points, on_delete=models.CASCADE, default=1, related_name='end_point')
-    trip1_intermediate_points = models.ManyToManyField(Points, related_name='trip1_intermediate_points')
-    trip2_intermediate_points = models.ManyToManyField(Points, related_name='trip2_intermediate_points')
+    trip1_intermediate_points = models.ManyToManyField(Points, related_name='trip1_intermediate_points', default=1)
+    trip2_intermediate_points = models.ManyToManyField(Points, related_name='trip2_intermediate_points', default=1)
     seats_offered = models.IntegerField(choices=seats_offered_choices, default=3)
     pay_status = models.IntegerField(choices=pay_status_choices,default=0)
-    trip1_time = models.TimeField()
-    trip2_time = models.TimeField()
+    trip1_time = models.TimeField(blank=True, default='00:00:00')
+    trip2_time = models.TimeField(blank=True, default='00:00:00')
     members = models.ManyToManyField(Users, through='Membership')
 
     class Meta:
@@ -115,7 +115,7 @@ class Membership(models.Model):
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE)
     trip_type = models.IntegerField(choices=trip_type_choices)
-    entry_point = models.ForeignKey(Points, on_delete=models.CASCADE)
+    point = models.ForeignKey(Points, on_delete=models.CASCADE)
 
 
 class GroupsHistory(models.Model):

@@ -12,7 +12,7 @@
     {% if requests %}
         {% for request in requests %}
             <u><b>{{ forloop.counter }}.)</b>
-            {% if trip_type == 1 %}
+            {% if request.trip_type == 1 %}
                 <b>Enroute</b>
             {% else %}
                 <b>Return</b>
@@ -22,7 +22,7 @@
             <b>Requested Point : </b> {{ request.point.point_name }}
             <br/>
             <b>Starting Time : </b>
-            {% if trip_type == 1 %}
+            {% if request.trip_type == 1 %}
                 {{ request.group.trip1_time }}
             {% else %}
                 {{ request.group.trip2_time }}
@@ -43,7 +43,7 @@
 
 <h2>Enroute</h2>
 {% if user_id in trip1_members_list %}
-    <b>Destination</b> : {{ group.end_point.point_name }} <br/>
+    <b>Starting Point</b> : {{ group.end_point.point_name }} <br/>
     <b>Starting Time</b> : {{ group.trip1_time }}<br/>
     <b>Payment Status</b> :
     {% if group.pay_status == 0 %}
