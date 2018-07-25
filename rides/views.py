@@ -23,7 +23,6 @@ def groups(request, user_id):
     'user_id' : user_id
     }
     return render(request, 'rides/groups.html', context)
-    #This is the my groups page.
 
 
 
@@ -49,12 +48,12 @@ def group_member(request, group_id, user_id):
     trip1_status = 'Available'
     trip2_status = 'Available'
 
-    if group.start_point == 1 :
+    if group.start_point.id == 1 :
         trip1_status = 'Not Available'
     if available_seats_trip1 == 0 :
         trip1_status = 'Pool is full'
 
-    if group.end_point == 1 :
+    if group.end_point.id == 1 :
         trip2_status = 'Not Available'
     if available_seats_trip2 == 0 :
         trip2_status = 'Pool is full'
@@ -81,27 +80,44 @@ def group_member(request, group_id, user_id):
 
 def request_ride(request, group_id, user_id):
     group = Groups.objects.get(id = group_id)
-    if request.method == 'POST':
-        if 'cancel' in request.POST :
-            return redirect('rides:group_member',group_id,user_id)
-        else :
-            post_data = request.POST.copy()
-            post_data['group'] = group_id
-            post_data['user'] = user_id
-            if 'enroute' in request.POST :
-                post_data['trip_type'] = 1
-            form = RequestRideForm(post_data)
-            if form.is_valid():
-                form.save()
-                return redirect('rides:group_member',group_id,user_id)
-            #else: print error messages for time too
+    trip1_points = group.trip1_intermediate_points.all().values_list('id', flat=True)
+    trip2_points = group.trip2_intermediate_points.all().values_list('id', flat=True)
+    trip1_points = list(map(str, trip1_points))
+    trip2_points = list(map(str, trip2_points))
+    error_message = ''
     form = RequestRideForm()
     context = {
     'form' : form,
     'group' : group,
+    'error_message' : error_message,
+    'trip1_points' : trip1_points,
+    'trip2_points' : trip2_points
     }
+    if request.method == 'POST':
+        if 'cancel' in request.POST :
+            return redirect('rides:group_member',group_id,user_id)
+        elif 'request' in request.POST :
+            post_data = request.POST.copy()
+            if (post_data['trip_type'][0] == '1' and group.start_point.id == 1) or (post_data['trip_type'][0] == '2' and group.end_point.id == 1) :
+                context['error_message'] = 'Ride Not Available.'
+                form = RequestRideForm()
+                return render(request, 'rides/request_ride.html', context)
+            elif (post_data['point'] not in trip1_points and post_data['trip_type'][0] == '1' and post_data['point'] != group.start_point.id) or (post_data['point'] not in trip2_points and post_data['trip_type'][0] == '2' and post_data['point'] != group.end_point.id):
+                context['error_message'] = 'This ride is not through your area'
+                form = RequestRideForm()
+                return render(request, 'rides/request_ride.html', context)
+            else :
+                post_data['group'] = group_id
+                post_data['user'] = user_id
+                form_return = RequestRideForm(post_data)
+                if form_return.is_valid():
+                    form_return.save()
+                    return redirect('rides:group_member',group_id,user_id)
+                else :
+                    context['error_message'] = 'ERROR: You might have requested earlier'
+                    form = RequestRideForm()
+                    return render(request, 'rides/request_ride.html', context)
     return render(request, 'rides/request_ride.html', context)
-    #This is the request ACTION in group expansion of group member
 
 
 
@@ -135,10 +151,10 @@ def group_owner(request, group_id):
     trip1_status = 'Available'
     trip2_status = 'Available'
 
-    if group.start_point == 1 :
+    if group.start_point.id == 1 :
         trip1_status = 'Not Available'
 
-    if group.end_point == 1 :
+    if group.end_point.id == 1 :
         trip2_status = 'Not Available'
 
     context = {
@@ -156,7 +172,6 @@ def group_owner(request, group_id):
     if request.method == 'POST':
         return render(request, 'rides/group_owner.html', context)
     return render(request, 'rides/group_owner.html', context)
-    #This is the group expansion for group owner.
 
 
 def configure_ride(request, group_id):
@@ -181,7 +196,7 @@ def configure_ride(request, group_id):
      'group': group
      }
     return render(request, 'rides/configure_ride.html', context)
-    #This is the ACTION configuring the ride in group expansion of group owner
+    #Add constraints to configure by considering riders also
 
 
 def search_ride(request):
