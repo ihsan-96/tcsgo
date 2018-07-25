@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <style>
+.btn {
+  background-color: #0377CE;
+  border: none;
+
+  text-align: center;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background-color: #3680BF;
+  color: white;
+}
+.navbar-inverse .navbar-nav>li>a {
+    color: #fff;
+}
+.navbar-inverse .navbar-brand {
+    color: #fff;
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse" style="background-color :#0377CE;border : none; ">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand btn"  href="#"><b>TcsGO</b></a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar" >
+      <ul class="nav navbar-nav">
+        <li class="btn" ><a href="#">link1</a></li>
+        <li class="btn"><a href="#">link2</a></li>
+        <li class="btn"><a href="#">link3</a></li>
+      </ul>
+
+    </div>
+  </div>
+</nav>
+<div class="w3-bar" style="background-color :#0377CE; margin-top: -1%; padding-top: 0;" >
+  <button class="btn" onclick="displayChhoice('Enroute')">Enroute</button>
+  <button class="btn" onclick="displayChhoice('Return')">Return</button>
+  <button class="btn" onclick="displayChhoice('Requests')">Requests</button>
+</div>
+
+<div id="Enroute" class="w3-container ownerOption">
+  <h2>London</h2>
+  <p>London is the capital city of England.</p>
+</div>
+
+<div id="Return" class="w3-container ownerOption" style="display:none">
+  <h2>Paris</h2>
+  <p>Paris is the capital of France.</p>
+</div>
+
+<div id="Requests" class="w3-container ownerOption" style="display:none">
+  <div class="w3-card-4" style="width:80%; margin-left:10%; margin-top:.5%;" >
+
+    <div class="w3-container w3-center">
+      <h3>Ride Request</h3>
+
+      <h5>User Name</h5>
+		Location
+      <div class="w3-section">
+        <button class="w3-button w3-green">Accept</button>
+        <button class="w3-button w3-red">Reject</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function displayChhoice(ownerChoice) {
+    var i;
+    var x = document.getElementsByClassName("ownerOption");
+    for (i = 0; i < x.length; i++) {
+       x[i].style.display = "none";
+    }
+    document.getElementById(ownerChoice).style.display = "block";
+}
+</script>
+
+</body>
+</html>
