@@ -1,0 +1,19 @@
+<h2>Add new car</h2>
+<br/><br/>
+
+<form method="post">
+    {% csrf_token %}
+    <b>{{ form.car_number.label }}</b> : {{ form.car_number }}
+    <br/>
+    {{ form.car_number.help_text }}
+    <br/><br/>
+    <b>{{ form.car_name.label }}</b> : {{ form.car_name }}
+    <br/>
+    {{ form.car_name.help_text }}
+    <br/><br/>
+    <b>{{ form.mileage.label }}</b> : {{ form.mileage }}
+    <br/>
+    <b>{{ error_message }}</b>  {{ form.errors }}
+    <br/>
+    <input type="submit" value="Add Ride" name="add_ride"/>
+</form>

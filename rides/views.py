@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 
 from .models import GroupsHistory, Cars, Points, Membership, Groups, Requests, Users
 
-from .forms import RequestRideForm, ConfigureRideForm
+from .forms import RequestRideForm, ConfigureRideForm, SearchRideForm, AddRideForm
 
 
 def index(request):
@@ -199,28 +199,94 @@ def configure_ride(request, group_id):
     #Add constraints to configure by considering riders also
 
 
-def search_ride(request):
-    response = "You're looking at the finding new rides page"
-    return HttpResponse(response)
-    #This is the page where user search for new rides
+def search_ride(request, user_id):
+    if request.method == 'POST' :
+        point_id = int(request.POST['point'])
+        return redirect('rides:search_results', user_id,  point_id)
+    form = SearchRideForm()
+    context = {
+    'form' : form
+    }
+    return render(request, 'rides/search_ride.html', context)
 
 
-def searching_ride(request, point_id):
-    return HttpResponse("You're searching ride from point %s." % point_id)
-    #This is the ACTION of searching new rides
+def search_results(request, user_id, point_id):
+    trip1_ip = list(Points.objects.get(id = point_id).trip1_intermediate_points.all())
+    trip1_sp = list(Groups.objects.filter(start_point_id = point_id))
+    trip1 = trip1_sp + trip1_ip
+    trip1.sort(key=lambda x: x.trip1_time)
+    trip2_ip = list(Points.objects.get(id = point_id).trip2_intermediate_points.all())
+    trip2_sp = list(Groups.objects.filter(end_point_id = point_id))
+    trip2 = trip2_sp + trip2_ip
+    trip2.sort(key=lambda x: x.trip2_time)
+    context = {
+    'trip1_list' : trip1,
+    'trip2_list' : trip2,
+    'user_id' : user_id
+    }
+    return render(request, 'rides/search_results.html', context)
 
-def search_results(request, point_id):
-    rides_list = Groups.objects.filter(Q(start_point_id=point_id) | Q(end_point_id=point_id) | Q(trip1_intermediate_points__id=point_id) | Q(trip2_intermediate_points__id=point_id) ).distinct()
-    output = ', '.join([g.owner.last_name + ' - ' + g.car.car_name for g in rides_list])
-    return HttpResponse(output)
-    #This is the results page of searching new rides
 
+# def request_ride(request, group_id, user_id):
+#     group = Groups.objects.get(id = group_id)
+#     trip1_points = group.trip1_intermediate_points.all().values_list('id', flat=True)
+#     trip2_points = group.trip2_intermediate_points.all().values_list('id', flat=True)
+#     trip1_points = list(map(str, trip1_points))
+#     trip2_points = list(map(str, trip2_points))
+#     error_message = ''
+#     form = RequestRideForm()
+#     context = {
+#     'form' : form,
+#     'group' : group,
+#     'error_message' : error_message,
+#     'trip1_points' : trip1_points,
+#     'trip2_points' : trip2_points
+#     }
+#     if request.method == 'POST':
+#         if 'cancel' in request.POST :
+#             return redirect('rides:group_member',group_id,user_id)
+#         elif 'request' in request.POST :
+#             post_data = request.POST.copy()
+#             if (post_data['trip_type'][0] == '1' and group.start_point.id == 1) or (post_data['trip_type'][0] == '2' and group.end_point.id == 1) :
+#                 context['error_message'] = 'Ride Not Available.'
+#                 form = RequestRideForm()
+#                 return render(request, 'rides/request_ride.html', context)
+#             elif (post_data['point'] not in trip1_points and post_data['trip_type'][0] == '1' and post_data['point'] != group.start_point.id) or (post_data['point'] not in trip2_points and post_data['trip_type'][0] == '2' and post_data['point'] != group.end_point.id):
+#                 context['error_message'] = 'This ride is not through your area'
+#                 form = RequestRideForm()
+#                 return render(request, 'rides/request_ride.html', context)
+#             else :
+#                 post_data['group'] = group_id
+#                 post_data['user'] = user_id
+#                 form_return = RequestRideForm(post_data)
+#                 if form_return.is_valid():
+#                     form_return.save()
+#                     return redirect('rides:group_member',group_id,user_id)
+#                 else :
+#                     context['error_message'] = 'ERROR: You might have requested earlier'
+#                     form = RequestRideForm()
+#                     return render(request, 'rides/request_ride.html', context)
+#     return render(request, 'rides/request_ride.html', context)
 
-def add_ride(request):
-    return HttpResponse("You're looking at adding a new ride's page.")
-    #This is the page for adding new cars, also an inactive group will be automatically added.
-
-
-def adding_ride(request, user_id):
-    return HttpResponse("You're adding a new ride by %s." % user_id)
-    #This is the ACTION of adding new rides
+def add_ride(request, user_id):
+    form = AddRideForm()
+    error_message = ''
+    context = {
+    'form' : form
+    }
+    if request.method == 'POST' :
+        post_data = request.POST.copy()
+        post_data['owner'] = user_id
+        car_number = post_data['car_number']
+        form_return = AddRideForm(post_data)
+        if form_return.is_valid():
+            form_return.save()
+            car = Cars.objects.get(car_number = car_number)
+            user = Users.objects.get(id = user_id)
+            new_group = Groups.objects.create(owner = user, car = car)
+            return redirect('rides:groups', user_id)
+        else :
+            context['error_message'] = 'ERROR: Car already exists.'
+            form = AddRideForm()
+            return render(request, 'rides/add_ride.html', context)
+    return render(request, 'rides/add_ride.html', context)

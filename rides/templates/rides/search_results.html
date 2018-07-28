@@ -1,0 +1,34 @@
+<h1>Search Results</h1>
+
+<h3>Enroute</h3>
+
+{% if trip1_list %}
+    <ul>
+    {% for group in trip1_list %}
+        {% if user_id == group.owner_id %}
+            <li><a href="{% url 'rides:group_owner' group.id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
+        {% else %}
+            <li><a href="{% url 'rides:group_member' group.id user_id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>There is no rides touching your area.</p>
+{% endif %}
+
+
+<h3>Return</h3>
+
+{% if trip2_list %}
+    <ul>
+    {% for group in trip2_list %}
+        {% if user_id == group.owner_id %}
+            <li><a href="{% url 'rides:group_owner' group.id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
+        {% else %}
+            <li><a href="{% url 'rides:group_member' group.id user_id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>There is no rides touching your area.</p>
+{% endif %}

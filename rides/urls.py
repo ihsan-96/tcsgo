@@ -24,18 +24,12 @@ urlpatterns = [
     path('<int:group_id>/owner/configure_ride', views.configure_ride, name='configure_ride'),
 
     # ex: /rides/search_ride
-    path('search_ride/', views.search_ride, name='search_ride'),
+    path('search_ride/<int:user_id>', views.search_ride, name='search_ride'),
 
     # ex: /rides/search_ride/3
-    path('search_ride/<int:point_id>', views.searching_ride, name='searching_ride'),
-
-    # ex: /rides/search_ride/3/search_results
-    path('search_ride/<int:point_id>/search_results', views.search_results, name='search_results'),
-
-    # ex: /rides/add_ride
-    path('add_ride/', views.add_ride, name='add_ride'),
+    path('<int:user_id>/search_ride/<int:point_id>', views.search_results, name='search_results'),
 
     # ex: /rides/add_ride/2
-    path('add_ride/<int:user_id>', views.adding_ride, name='adding_ride'),
+    path('add_ride/<int:user_id>', views.add_ride, name='add_ride'),
 
 ]

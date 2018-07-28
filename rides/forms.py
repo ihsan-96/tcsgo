@@ -1,8 +1,24 @@
 from django import forms
 
-from .models import Requests, Groups
+from .models import Requests, Groups, Points, Cars
 
 from django.utils.translation import gettext_lazy as _
+
+
+class AddRideForm(forms.ModelForm):
+    class Meta:
+        model = Cars
+        fields = ['car_number', 'owner', 'car_name', 'mileage']
+        widgets = { 'owner': forms.HiddenInput() }
+        labels = {
+            'car_number': _('Car Registration Number'),
+            'car_name': _('Car Model'),
+            'mileage': _('Mileage'),
+        }
+        help_texts = {
+            'car_number': _('Ex : KL 07 AH 4050'),
+            'car_name': _('Ex : Honda City'),
+        }
 
 
 class RequestRideForm(forms.ModelForm):
@@ -49,3 +65,7 @@ class ConfigureRideForm(forms.ModelForm):
             'trip1_time': _('Starting time of your enroute trip in "HH:MM:SS" format'),
             'trip2_time': _('Starting point of your return trip in "HH:MM:SS" format')
         }
+
+
+class SearchRideForm(forms.Form):
+    point = forms.ModelChoiceField(queryset=Points.objects.exclude(id = 1))

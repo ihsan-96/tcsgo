@@ -1,0 +1,8 @@
+<h1>Search Ride</h1>
+<form method="post">
+    {% csrf_token %}
+    <br/>
+    {{ form }}
+    <br/><br/>
+    <input type="submit" value="Search Rides" name="search"/>
+</form>

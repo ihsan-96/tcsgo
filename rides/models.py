@@ -40,6 +40,9 @@ class Cars(models.Model):
     car_name = models.CharField(max_length=25)
     mileage = models.IntegerField(default=30)
 
+    class Meta:
+        unique_together = ('owner', 'car_number')
+
     def __str__(self):
         return self.car_number
 
@@ -67,7 +70,7 @@ pay_status_choices =(
 
 class Groups(models.Model):
     owner = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='owner')
-    car = models.ForeignKey(Cars, on_delete=models.CASCADE)
+    car = models.ForeignKey(Cars, on_delete=models.CASCADE, unique = True)
     start_point = models.ForeignKey(Points, on_delete=models.CASCADE, default=1, related_name='start_point')
     end_point = models.ForeignKey(Points, on_delete=models.CASCADE, default=1, related_name='end_point')
     trip1_intermediate_points = models.ManyToManyField(Points, related_name='trip1_intermediate_points', default=1)
