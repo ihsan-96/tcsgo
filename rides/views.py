@@ -1,32 +1,85 @@
 from django.http import HttpResponse
-
 from django.db.models import Q
-
 from django.shortcuts import render, redirect
-
 from .models import GroupsHistory, Cars, Points, Membership, Groups, Requests, Users
+from .forms import RequestRideForm, ConfigureRideForm, SearchRideForm, AddRideForm, UserForm, UsersForm
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 
-from .forms import RequestRideForm, ConfigureRideForm, SearchRideForm, AddRideForm
+
+
+def signup(request):
+    form = UserForm()
+    context = {
+    'form' : form
+    }
+    if request.method == 'POST' :
+        form_return = UserForm(request.POST)
+        if form_return.is_valid() :
+            user = form_return.save(commit = False)
+            username = form_return.cleaned_data['username']
+            password = form_return.cleaned_data['password']
+            user.set_password(password)
+            user.save()
+            user = authenticate(username = username, password = password)
+
+            if user is not None :
+                if user.is_active:
+                    login(request, user)
+                    return redirect('rides:add_details')
+
+    return render(request, 'rides/signup.html', context)
+
+
+def add_details(request):
+    form = UsersForm()
+    error_message = ""
+    context = {
+    'form' : form,
+    'error_message' : error_message
+    }
+    if request.method == 'POST':
+        form_return = UsersForm(request.POST)
+        if form_return.is_valid():
+            user = User.objects.get(id = request.user.id)
+            users = Users.objects.create(user_reference = user.id,
+            first_name = user.first_name,
+            last_name = user.last_name,
+            email = user.email,
+            sex = request.POST['sex'],
+            phone_number = request.POST['phone_number'],
+            dl_number = request.POST['dl_number'],
+            blood_group = request.POST['blood_group'],
+            employee_number = request.POST['employee_number'],
+            card_number = request.POST['card_number'],
+            )
+            return redirect('rides:groups')
+        else:
+            error_message="Some of the information given here is already used."
+
+    return render(request, 'rides/add_details.html', context)
+
 
 
 def index(request):
     return HttpResponse("You're looking at index view of rider")
     #This the Index of Rider. Currently nothing is here
 
-def groups(request, user_id):
-
-    groups_history_list = GroupsHistory.objects.filter( members__id=user_id ).order_by('-date').distinct()
-    groups_owner_list = Groups.objects.filter( owner_id=user_id ).distinct()
+def groups(request):
+    user_id = request.user.id
+    user = Users.objects.get(user_reference = user_id)
+    groups_history_list = GroupsHistory.objects.filter( members__id=user.id ).order_by('-date').distinct()
+    groups_owner_list = Groups.objects.filter( owner_id=user.id ).distinct()
     context = {
     'groups_history_list' : groups_history_list,
     'groups_owner_list' : groups_owner_list,
-    'user_id' : user_id
+    'user_id' : user.id
     }
     return render(request, 'rides/groups.html', context)
 
 
 
-def group_member(request, group_id, user_id):
+def group_member(request, group_id):
 
     if request.method == 'POST':
         if 'delete_request' in request.POST:
@@ -36,9 +89,10 @@ def group_member(request, group_id, user_id):
             if request.POST['member_id']:
                 m = Membership.objects.get(id = request.POST['member_id'])
                 m.delete()
-
+    user_id = request.user.id
+    user = Users.objects.get(user_reference = user_id)
     group = Groups.objects.get(id = group_id)
-    requests = Requests.objects.filter(user_id = user_id)
+    requests = Requests.objects.filter(user_id = user.id)
     trip1_members = Membership.objects.filter(group_id=group_id).filter(trip_type=1)
     trip2_members = Membership.objects.filter(group_id=group_id).filter(trip_type=2)
     available_seats_trip1 = group.seats_offered - trip1_members.count()
@@ -62,7 +116,7 @@ def group_member(request, group_id, user_id):
     context = {
     'requests' : requests,
     'group' : group,
-    'user_id' : user_id,
+    'user_id' : user.id,
     'trip1_status' : trip1_status,
     'trip2_status' : trip2_status,
     'available_seats_trip1' : available_seats_trip1,
@@ -78,7 +132,9 @@ def group_member(request, group_id, user_id):
 
 
 
-def request_ride(request, group_id, user_id):
+def request_ride(request, group_id):
+    user_id = request.user.id
+    user = Users.objects.get(user_reference = user_id)
     group = Groups.objects.get(id = group_id)
     trip1_points = group.trip1_intermediate_points.all().values_list('id', flat=True)
     trip2_points = group.trip2_intermediate_points.all().values_list('id', flat=True)
@@ -91,11 +147,11 @@ def request_ride(request, group_id, user_id):
     'group' : group,
     'error_message' : error_message,
     'trip1_points' : trip1_points,
-    'trip2_points' : trip2_points
+    'trip2_points' : trip2_points,
     }
     if request.method == 'POST':
         if 'cancel' in request.POST :
-            return redirect('rides:group_member',group_id,user_id)
+            return redirect('rides:group_member',group_id)
         elif 'request' in request.POST :
             post_data = request.POST.copy()
             if (post_data['trip_type'][0] == '1' and group.start_point.id == 1) or (post_data['trip_type'][0] == '2' and group.end_point.id == 1) :
@@ -108,11 +164,11 @@ def request_ride(request, group_id, user_id):
                 return render(request, 'rides/request_ride.html', context)
             else :
                 post_data['group'] = group_id
-                post_data['user'] = user_id
+                post_data['user'] = user.id
                 form_return = RequestRideForm(post_data)
                 if form_return.is_valid():
                     form_return.save()
-                    return redirect('rides:group_member',group_id,user_id)
+                    return redirect('rides:group_member',group_id)
                 else :
                     context['error_message'] = 'ERROR: You might have requested earlier'
                     form = RequestRideForm()
@@ -124,7 +180,8 @@ def request_ride(request, group_id, user_id):
 
 
 def group_owner(request, group_id):
-
+    user_id = request.user.id
+    user = Users.objects.get(user_reference = user_id)
     if request.method == 'POST':
         if 'reject_request' in request.POST:
             r = Requests.objects.get(id = request.POST['request_id'])
@@ -199,10 +256,10 @@ def configure_ride(request, group_id):
     #Add constraints to configure by considering riders also
 
 
-def search_ride(request, user_id):
+def search_ride(request):
     if request.method == 'POST' :
         point_id = int(request.POST['point'])
-        return redirect('rides:search_results', user_id,  point_id)
+        return redirect('rides:search_results',  point_id)
     form = SearchRideForm()
     context = {
     'form' : form
@@ -210,7 +267,9 @@ def search_ride(request, user_id):
     return render(request, 'rides/search_ride.html', context)
 
 
-def search_results(request, user_id, point_id):
+def search_results(request, point_id):
+    user_id = request.user.id
+    user = Users.objects.get(user_reference = user_id)
     trip1_ip = list(Points.objects.get(id = point_id).trip1_intermediate_points.all())
     trip1_sp = list(Groups.objects.filter(start_point_id = point_id))
     trip1 = trip1_sp + trip1_ip
@@ -222,71 +281,34 @@ def search_results(request, user_id, point_id):
     context = {
     'trip1_list' : trip1,
     'trip2_list' : trip2,
-    'user_id' : user_id
+    'user_id' : user.id
     }
     return render(request, 'rides/search_results.html', context)
 
 
-# def request_ride(request, group_id, user_id):
-#     group = Groups.objects.get(id = group_id)
-#     trip1_points = group.trip1_intermediate_points.all().values_list('id', flat=True)
-#     trip2_points = group.trip2_intermediate_points.all().values_list('id', flat=True)
-#     trip1_points = list(map(str, trip1_points))
-#     trip2_points = list(map(str, trip2_points))
-#     error_message = ''
-#     form = RequestRideForm()
-#     context = {
-#     'form' : form,
-#     'group' : group,
-#     'error_message' : error_message,
-#     'trip1_points' : trip1_points,
-#     'trip2_points' : trip2_points
-#     }
-#     if request.method == 'POST':
-#         if 'cancel' in request.POST :
-#             return redirect('rides:group_member',group_id,user_id)
-#         elif 'request' in request.POST :
-#             post_data = request.POST.copy()
-#             if (post_data['trip_type'][0] == '1' and group.start_point.id == 1) or (post_data['trip_type'][0] == '2' and group.end_point.id == 1) :
-#                 context['error_message'] = 'Ride Not Available.'
-#                 form = RequestRideForm()
-#                 return render(request, 'rides/request_ride.html', context)
-#             elif (post_data['point'] not in trip1_points and post_data['trip_type'][0] == '1' and post_data['point'] != group.start_point.id) or (post_data['point'] not in trip2_points and post_data['trip_type'][0] == '2' and post_data['point'] != group.end_point.id):
-#                 context['error_message'] = 'This ride is not through your area'
-#                 form = RequestRideForm()
-#                 return render(request, 'rides/request_ride.html', context)
-#             else :
-#                 post_data['group'] = group_id
-#                 post_data['user'] = user_id
-#                 form_return = RequestRideForm(post_data)
-#                 if form_return.is_valid():
-#                     form_return.save()
-#                     return redirect('rides:group_member',group_id,user_id)
-#                 else :
-#                     context['error_message'] = 'ERROR: You might have requested earlier'
-#                     form = RequestRideForm()
-#                     return render(request, 'rides/request_ride.html', context)
-#     return render(request, 'rides/request_ride.html', context)
 
-def add_ride(request, user_id):
+def add_ride(request):
+    user_id = request.user.id
+    user = Users.objects.get(user_reference = user_id)
     form = AddRideForm()
     error_message = ''
     context = {
-    'form' : form
+    'form' : form,
+    'error_message' : error_message
     }
     if request.method == 'POST' :
         post_data = request.POST.copy()
-        post_data['owner'] = user_id
+        post_data['owner'] = user.id
         car_number = post_data['car_number']
         form_return = AddRideForm(post_data)
         if form_return.is_valid():
+            print("reached ")
             form_return.save()
             car = Cars.objects.get(car_number = car_number)
-            user = Users.objects.get(id = user_id)
             new_group = Groups.objects.create(owner = user, car = car)
-            return redirect('rides:groups', user_id)
+            return redirect('rides:groups')
         else :
-            context['error_message'] = 'ERROR: Car already exists.'
+            error_message = 'ERROR: Car already exists.'
             form = AddRideForm()
             return render(request, 'rides/add_ride.html', context)
     return render(request, 'rides/add_ride.html', context)

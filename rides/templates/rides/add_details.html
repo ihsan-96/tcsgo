@@ -1,0 +1,20 @@
+<h3>Add Details</h3>
+<form method="post">
+    {% csrf_token %}
+    <b>{{ form.sex.label }}</b> : {{ form.sex }}
+    <br/><br/>
+    <b>{{ form.phone_number.label }}</b> : {{ form.phone_number }}
+    <br/><br/>
+    <b>{{ form.dl_number.label }}</b> : {{ form.dl_number }}
+    <br/><br/>
+    <b>{{ form.blood_group.label }}</b> : {{ form.blood_group }}
+    <br/><br/>
+    <b>{{ form.employee_number.label }}</b> : {{ form.employee_number }}
+    <br/><br/>
+    <b>{{ form.card_number.label }}</b> : {{ form.card_number }}
+    <br/>
+    <b>{{ error_message }}</b>  {{ form.errors }}
+    <br/>
+    <b>{{ error_message }}</b>
+    <input type="submit" value="Signup" name="signup"/>
+</form>

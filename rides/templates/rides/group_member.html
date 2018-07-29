@@ -95,7 +95,7 @@
             {% endfor %}
             <br/>
         {% endif %}
-        <form action="{% url 'rides:request_ride' group.id user_id %}" method="post">
+        <form action="{% url 'rides:request_ride' group.id %}" method="post">
             {% csrf_token %}
             <input type="submit" value="Request"/>
         </form>
@@ -155,7 +155,7 @@
             {% endfor %}
             <br/>
         {% endif %}
-        <form action="{% url 'rides:request_ride' group.id user_id %}" method="post">
+        <form action="{% url 'rides:request_ride' group.id %}" method="post">
             {% csrf_token %}
             <input type="submit" value="Request"/>
         </form>

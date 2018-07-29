@@ -8,7 +8,7 @@
         {% if user_id == group.owner_id %}
             <li><a href="{% url 'rides:group_owner' group.id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
         {% else %}
-            <li><a href="{% url 'rides:group_member' group.id user_id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
+            <li><a href="{% url 'rides:group_member' group.id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
         {% endif %}
     {% endfor %}
     </ul>
@@ -25,7 +25,7 @@
         {% if user_id == group.owner_id %}
             <li><a href="{% url 'rides:group_owner' group.id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
         {% else %}
-            <li><a href="{% url 'rides:group_member' group.id user_id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
+            <li><a href="{% url 'rides:group_member' group.id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li>
         {% endif %}
     {% endfor %}
     </ul>

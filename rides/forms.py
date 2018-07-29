@@ -1,8 +1,34 @@
 from django import forms
-
-from .models import Requests, Groups, Points, Cars
-
+from .models import Requests, Groups, Points, Cars, Users
+from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
+
+
+class UserForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'password']
+        labels = {
+            'first_name': _('First Name'),
+            'last_name': _('Last Name'),
+            'email': _('E-Mail Id'),
+        }
+
+
+class UsersForm(forms.ModelForm):
+    class Meta:
+        model = Users
+        fields = ['sex', 'phone_number', 'dl_number', 'blood_group', 'employee_number', 'card_number']
+        widgets = { 'password': forms.PasswordInput() }
+        labels = {
+            'sex': _('Gender'),
+            'phone_number': _('Contact Number'),
+            'dl_number': _('Driving License Number'),
+            'blood_group': _('Blood Group'),
+            'employee_number': _('Employee Number'),
+            'card_number': _('Card Number'),
+        }
 
 
 class AddRideForm(forms.ModelForm):

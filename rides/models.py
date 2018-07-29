@@ -1,5 +1,4 @@
 from django.db import models
-
 from django.contrib import admin
 
 sex_choices = (
@@ -19,8 +18,8 @@ blood_group_choices = (
     ('8','AB-ve'),
 )
 class Users(models.Model):
+    user_reference = models.IntegerField()
     first_name = models.CharField(max_length=25)
-    middle_name = models.CharField(max_length=25, blank=True)
     last_name = models.CharField(max_length=25)
     sex = models.CharField(max_length=10, choices=sex_choices)
     email = models.EmailField(max_length=50, unique=True)
@@ -29,7 +28,6 @@ class Users(models.Model):
     blood_group = models.CharField(max_length=5, choices=blood_group_choices)
     employee_number = models.CharField(max_length=25, unique=True)
     card_number = models.CharField(max_length=25, unique=True)
-    password = models.CharField(max_length=50)
 
     def __str__(self):
         return '%s %s' % (self.first_name, self.last_name)
@@ -70,7 +68,7 @@ pay_status_choices =(
 
 class Groups(models.Model):
     owner = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='owner')
-    car = models.ForeignKey(Cars, on_delete=models.CASCADE, unique = True)
+    car = models.ForeignKey(Cars, on_delete=models.CASCADE)
     start_point = models.ForeignKey(Points, on_delete=models.CASCADE, default=1, related_name='start_point')
     end_point = models.ForeignKey(Points, on_delete=models.CASCADE, default=1, related_name='end_point')
     trip1_intermediate_points = models.ManyToManyField(Points, related_name='trip1_intermediate_points', default=1)
