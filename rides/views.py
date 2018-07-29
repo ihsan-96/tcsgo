@@ -5,32 +5,43 @@ from .models import GroupsHistory, Cars, Points, Membership, Groups, Requests, U
 from .forms import RequestRideForm, ConfigureRideForm, SearchRideForm, AddRideForm, UserForm, UsersForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import login
 
+
+def custom_login(request):
+    if request.user.is_authenticated:
+        return redirect('rides:groups')
+    else:
+        return login(request)
 
 
 def signup(request):
-    form = UserForm()
-    context = {
-    'form' : form
-    }
-    if request.method == 'POST' :
-        form_return = UserForm(request.POST)
-        if form_return.is_valid() :
-            user = form_return.save(commit = False)
-            username = form_return.cleaned_data['username']
-            password = form_return.cleaned_data['password']
-            user.set_password(password)
-            user.save()
-            user = authenticate(username = username, password = password)
+    if request.user.is_authenticated:
+        return redirect('rides:groups')
+    else:
+        form = UserForm()
+        context = {
+        'form' : form
+        }
+        if request.method == 'POST' :
+            form_return = UserForm(request.POST)
+            if form_return.is_valid() :
+                user = form_return.save(commit = False)
+                username = form_return.cleaned_data['username']
+                password = form_return.cleaned_data['password']
+                user.set_password(password)
+                user.save()
+                user = authenticate(username = username, password = password)
 
-            if user is not None :
-                if user.is_active:
-                    login(request, user)
-                    return redirect('rides:add_details')
+                if user is not None :
+                    if user.is_active:
+                        login(request, user)
+                        return redirect('rides:add_details')
 
-    return render(request, 'rides/signup.html', context)
+        return render(request, 'rides/signup.html', context)
 
-
+@login_required
 def add_details(request):
     form = UsersForm()
     error_message = ""
@@ -60,11 +71,7 @@ def add_details(request):
     return render(request, 'rides/add_details.html', context)
 
 
-
-def index(request):
-    return HttpResponse("You're looking at index view of rider")
-    #This the Index of Rider. Currently nothing is here
-
+@login_required
 def groups(request):
     user_id = request.user.id
     user = Users.objects.get(user_reference = user_id)
@@ -78,7 +85,7 @@ def groups(request):
     return render(request, 'rides/groups.html', context)
 
 
-
+@login_required
 def group_member(request, group_id):
 
     if request.method == 'POST':
@@ -131,7 +138,7 @@ def group_member(request, group_id):
     return render(request, 'rides/group_member.html', context)
 
 
-
+@login_required
 def request_ride(request, group_id):
     user_id = request.user.id
     user = Users.objects.get(user_reference = user_id)
@@ -178,7 +185,7 @@ def request_ride(request, group_id):
 
 
 
-
+@login_required
 def group_owner(request, group_id):
     user_id = request.user.id
     user = Users.objects.get(user_reference = user_id)
@@ -230,7 +237,7 @@ def group_owner(request, group_id):
         return render(request, 'rides/group_owner.html', context)
     return render(request, 'rides/group_owner.html', context)
 
-
+@login_required
 def configure_ride(request, group_id):
     group = Groups.objects.get(id = group_id)
     if request.method == 'POST':
@@ -256,6 +263,7 @@ def configure_ride(request, group_id):
     #Add constraints to configure by considering riders also
 
 
+@login_required
 def search_ride(request):
     if request.method == 'POST' :
         point_id = int(request.POST['point'])
@@ -267,6 +275,7 @@ def search_ride(request):
     return render(request, 'rides/search_ride.html', context)
 
 
+@login_required
 def search_results(request, point_id):
     user_id = request.user.id
     user = Users.objects.get(user_reference = user_id)
@@ -286,7 +295,7 @@ def search_results(request, point_id):
     return render(request, 'rides/search_results.html', context)
 
 
-
+@login_required
 def add_ride(request):
     user_id = request.user.id
     user = Users.objects.get(user_reference = user_id)
