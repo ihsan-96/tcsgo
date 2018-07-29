@@ -1,4 +1,4 @@
-<h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
+<!-- <h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
 <b>{{ group.car.car_name }}</b>
 <br/>
 <b>{{ group.car.car_number }}</b>
@@ -42,4 +42,114 @@
 <form method="post">
     {% csrf_token %}
     <input type="submit" value="Cancel" name="cancel"/>
-</form>
+</form> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>My Groups</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <style>
+.btn {
+  background-color: #0377CE;
+  border: none;
+  text-align: center;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition: 0.3s;
+}
+.btn:hover {
+  background-color: #3680BF;
+  color: white;
+}
+.navbar-inverse .navbar-nav>li>a {
+    color: #fff;
+}
+.navbar-inverse .navbar-brand {
+    color: #fff;
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse" style="background-color :#0377CE;border : none; ">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand btn"  href="{% url 'rides:groups' %}"><b>TcsGO</b></a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar" style="float:right;">
+      <ul class="nav navbar-nav">
+        <li class="btn" ><a href="{% url 'rides:search_ride' %}">Search</a></li>
+        <li class="btn"><a href="{% url 'rides:add_ride' %}">Add Ride</a></li>
+        <li class="btn"><a href="{% url 'logout' %}">Logout</a></li>
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<div class="w3-container">
+    <h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
+    <b>{{ group.car.car_name }}</b>
+    <br/>
+    <b>{{ group.car.car_number }}</b>
+    <br/><br/>
+    <div class="w3-panel w3-card">
+      <div class="form-group">
+        <form method="post">
+            {% csrf_token %}
+            <b>{{ form.start_point.label }}</b> : {{ form.start_point }}
+            <br/>
+            {{ form.start_point.help_text }}
+            <br/><br/>
+            <b>{{ form.end_point.label }}</b> : {{ form.end_point }}
+            <br/>
+            {{ form.end_point.help_text }}
+            <br/><br/>
+            <b>{{ form.trip1_intermediate_points.label }}</b> : {{ form.trip1_intermediate_points }}
+            <br/>
+            {{ form.trip1_intermediate_points.help_text }}
+            <br/><br/>
+            <b>{{ form.trip2_intermediate_points.label }}</b> : {{ form.trip2_intermediate_points }}
+            <br/>
+            {{ form.trip2_intermediate_points.help_text }}
+            <br/><br/>
+            <b>{{ form.seats_offered.label }}</b> : {{ form.seats_offered }}
+            <br/>
+            {{ form.seats_offered.help_text }}
+            <br/><br/>
+            <b>{{ form.pay_status.label }}</b> : {{ form.pay_status }}
+            <br/>
+            {{ form.pay_status.help_text }}
+            <br/><br/>
+            <b>{{ form.trip1_time.label }}</b> : {{ form.trip1_time }}
+            <br/>
+            {{ form.trip1_time.help_text }}
+            <br/><br/>
+            <b>{{ form.trip2_time.label }}</b> : {{ form.trip2_time }}
+            <br/>
+            {{ form.trip2_time.help_text }}
+            <br/><br/>
+            <input type="submit" class="btn btn-primary" value="Configure Ride" name="configure_ride"/>
+            <input type="submit" class="btn btn-danger" value="Cancel" name="cancel"/>
+        </form>
+      </div>
+    </div>
+</div>
+
+
+</body>
+</html>

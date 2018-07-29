@@ -1,4 +1,4 @@
-<h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
+<!-- <h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
 <h3>{{ group.car.car_name }}</h3>
 <b>{{ group.car.car_number }}</b>
 <br/>
@@ -160,4 +160,263 @@
             <input type="submit" value="Request"/>
         </form>
     {% endif %}
-{% endif %}
+{% endif %} -->
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>My Groups</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <style>
+.btn {
+  background-color: #0377CE;
+  border: none;
+  text-align: center;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition: 0.3s;
+}
+.btn:hover {
+  background-color: #3680BF;
+  color: white;
+}
+.navbar-inverse .navbar-nav>li>a {
+    color: #fff;
+}
+.navbar-inverse .navbar-brand {
+    color: #fff;
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse" style="background-color :#0377CE;border : none; ">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand btn"  href="{% url 'rides:groups' %}"><b>TcsGO</b></a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar" style="float:right;">
+      <ul class="nav navbar-nav">
+        <li class="btn" ><a href="{% url 'rides:search_ride' %}">Search</a></li>
+        <li class="btn"><a href="{% url 'rides:add_ride' %}">Add Ride</a></li>
+        <li class="btn"><a href="{% url 'logout' %}">Logout</a></li>
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+<h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
+<h3>{{ group.car.car_name }}</h3>
+<b>{{ group.car.car_number }}</b>
+<br/>
+
+<div class="w3-bar" style="background-color :#0377CE; margin-top: -1%; padding-top: 0;" >
+        <button class="btn" onclick="displayChhoice('Requests')">Requests</button>
+        <button class="btn" onclick="displayChhoice('Enroute')">Enroute</button>
+        <button class="btn" onclick="displayChhoice('Return')">Return</button>
+</div>
+
+
+<div id="Requests" class="w3-container ownerOption">
+    <div class="w3-container">
+        {% if user_id in trip2_members %}
+            <b>You are already a member in this group</b>
+        {% else %}
+            {% if requests %}
+                {% for request in requests %}
+                    <div class="w3-panel w3-card">
+                        <h3>
+                        {% if request.trip_type == 1 %}
+                            <b>Enroute</b>
+                        {% else %}
+                            <b>Return</b>
+                        {% endif %}
+                        </h3>
+                        <b>Requested Point : </b> {{ request.point.point_name }}
+                        <br/>
+                        <b>Starting Time : </b>
+                        {% if request.trip_type == 1 %}
+                            {{ request.group.trip1_time }}
+                        {% else %}
+                            {{ request.group.trip2_time }}
+                        {% endif %}
+                        <br/>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type='hidden' name="request_id" value="{{ request.id }}"/>
+                            <input type="submit" class="btn btn-danger" value="Delete" name='delete_request'/>
+                        </form>
+                        <br/>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <b>You haven't requested in this group</b>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+
+
+<div id="Enroute" class="w3-container ownerOption" style="display:none">
+    <div class="w3-container">
+        <div class="w3-panel w3-card">
+            {% if user_id in trip1_members_list %}
+                <b>Starting Point</b> : {{ group.start_point.point_name }} <br/>
+                <b>Starting Time</b> : {{ group.trip1_time }}<br/>
+                <b>Payment Status</b> :
+                {% if group.pay_status == 0 %}
+                    No Pay
+                {% else %}
+                    paid
+                {% endif %}
+                <br/>
+                <form method="post">
+                    {% csrf_token %}
+                {% if trip1_members %}
+                    <b>You are pooling with :</b>
+                    <br/>
+                    {% for member in trip1_members %}
+                        {% if member.user.id != user_id%}
+                            {{member.user.first_name}} {{ member.user.last_name }}
+                            <br/>
+                        {% else %}
+                            <input type='hidden' name="member_id" value="{{ member.id }}"/>
+                        {% endif%}
+                    {% endfor %}
+                    <br/>
+                {% endif %}
+                    <input type="submit" class="btn btn-danger" value="Leave Group" name='leave_trip'/>
+                </form>
+            {% else %}
+                <b>Ride Availability</b> : {{ trip1_status }}
+                <br/>
+                {% if trip1_status == 'Available' %}
+                    <b>Starting Point</b> : {{ group.start_point.point_name }} <br/>
+                    <b>Starting Time</b> : {{ group.trip1_time }} <br/>
+                    <b>Payment Status</b> :
+                    {% if group.pay_status == 0 %}
+                        No Pay
+                    {% else %}
+                        paid
+                    {% endif %}
+                    <br/>
+                    <b>Available Seats</b> : {{ available_seats_trip1 }}
+                    <br/>
+                    {% if trip1_members %}
+                        <b>Pooling with :</b>
+                        <br/>
+                        {% for member in trip1_members %}
+                            {% if member.user.id != user_id%}
+                                {{member.user.first_name}} {{ member.user.last_name }}
+                                <br/>
+                            {% endif%}
+                        {% endfor %}
+                        <br/>
+                    {% endif %}
+                    <form action="{% url 'rides:request_ride' group.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary" value="Request"/>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<div id="Return" class="w3-container ownerOption" style="display:none">
+    <div class="w3-container">
+        <div class="w3-panel w3-card">
+            {% if user_id in trip2_members_list %}
+                <b>Destination</b> : {{ group.end_point.point_name }} <br/>
+                <b>Starting Time</b> : {{ group.trip2_time }}<br/>
+                <b>Payment Status</b> :
+                {% if group.pay_status == 0 %}
+                    No Pay
+                {% else %}
+                    paid
+                {% endif %}
+                <br/>
+                <form method="post">
+                    {% csrf_token %}
+                {% if trip2_members %}
+                    <b>You are pooling with :</b>
+                    <br/>
+                    {% for member in trip2_members %}
+                        {% if member.user.id != user_id%}
+                            {{member.user.first_name}} {{ member.user.last_name }}
+                            <br/>
+                        {% else %}
+                            <input type='hidden' name="member_id" value="{{ member.id }}"/>
+                        {% endif%}
+                    {% endfor %}
+                    <br/>
+                {% endif %}
+                    <input type="submit" class="btn btn-danger" value="Leave Group" name='leave_trip'/>
+                </form>
+            {% else %}
+                <b>Ride Availability</b> : {{ trip2_status }}
+                <br/>
+                {% if trip2_status == 'Available' %}
+                    <b>Destination</b> : {{ group.end_point.point_name }} <br/>
+                    <b>Starting Time</b> : {{ group.trip2_time }} <br/>
+                    <b>Payment Status</b> :
+                    {% if group.pay_status == 0 %}
+                        No Pay
+                    {% else %}
+                        paid
+                    {% endif %}
+                    <br/>
+                    <b>Available Seats</b> : {{ available_seats_trip2 }}
+                    <br/>
+                    {% if trip2_members %}
+                        <b>Pooling with :</b>
+                        <br/>
+                        {% for member in trip2_members %}
+                            {% if member.user.id != user_id%}
+                                {{member.user.first_name}} {{ member.user.last_name }}
+                                <br/>
+                            {% endif%}
+                        {% endfor %}
+                        <br/>
+                    {% endif %}
+                    <form action="{% url 'rides:request_ride' group.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary" value="Request"/>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+   function displayChhoice(ownerChoice) {
+       var i;
+       var x = document.getElementsByClassName("ownerOption");
+       for (i = 0; i < x.length; i++) {
+          x[i].style.display = "none";
+       }
+       document.getElementById(ownerChoice).style.display = "block";
+   }
+</script>
+</body>
+</html>

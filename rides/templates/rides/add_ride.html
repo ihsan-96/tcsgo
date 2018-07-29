@@ -1,4 +1,4 @@
-<h2>Add new car</h2>
+<!-- <h2>Add new car</h2>
 <br/><br/>
 
 <form method="post">
@@ -16,4 +16,91 @@
     <b>{{ error_message }}</b>  {{ form.errors }}
     <br/>
     <input type="submit" value="Add Ride" name="add_ride"/>
-</form>
+</form> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>My Groups</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <style>
+.btn {
+  background-color: #0377CE;
+  border: none;
+  text-align: center;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition: 0.3s;
+}
+.btn:hover {
+  background-color: #3680BF;
+  color: white;
+}
+.navbar-inverse .navbar-nav>li>a {
+    color: #fff;
+}
+.navbar-inverse .navbar-brand {
+    color: #fff;
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse" style="background-color :#0377CE;border : none; ">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand btn"  href="{% url 'rides:groups' %}"><b>TcsGO</b></a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar" style="float:right;">
+      <ul class="nav navbar-nav">
+        <li class="btn" ><a href="{% url 'rides:search_ride' %}">Search</a></li>
+        <li class="btn"><a href="{% url 'rides:add_ride' %}">Add Ride</a></li>
+        <li class="btn"><a href="{% url 'logout' %}">Logout</a></li>
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<h2>Add new car</h2>
+
+<div class="w3-container">
+  <div class="w3-panel w3-card">
+    <div class="form-group">
+      <form method="post">
+          {% csrf_token %}
+          <b>{{ form.car_number.label }}</b> : {{ form.car_number }}
+          <br/>
+          {{ form.car_number.help_text }}
+          <br/><br/>
+          <b>{{ form.car_name.label }}</b> : {{ form.car_name }}
+          <br/>
+          {{ form.car_name.help_text }}
+          <br/><br/>
+          <b>{{ form.mileage.label }}</b> : {{ form.mileage }}
+          <br/>
+          <b>{{ error_message }}</b>  {{ form.errors }}
+          <br/>
+          <input type="submit" class="btn btn-primary" value="Add Ride" name="add_ride"/>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
