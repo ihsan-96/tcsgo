@@ -120,7 +120,7 @@ USE_TZ = True
 
 LOGIN_REDIRECT_URL = 'rides:groups'
 
-LOGIN_URL = 'login'
+LOGIN_URL = 'rides:login'
 
 
 

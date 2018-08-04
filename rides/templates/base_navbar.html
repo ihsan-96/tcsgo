@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+  <nav class="navbar navbar-inverse navbar-expand-lg" style="background-color :#0377CE;border : none; ">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand btn"  href="{% url 'rides:groups' %}"><b>TcsGO</b></a>
+      </div>
+      <div class="collapse navbar-collapse" id="myNavbar" style="float:right;">
+        <ul class="nav navbar-nav">
+          <li class="btn" ><a href="{% url 'rides:search_ride' %}">Search</a></li>
+          <li class="btn"><a href="{% url 'rides:add_ride' %}">Add Ride</a></li>
+          <li class="btn"><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+      {% block container %}{% endblock %}
+  </div>
+{% endblock %}

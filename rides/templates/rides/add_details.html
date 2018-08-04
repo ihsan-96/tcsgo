@@ -1,20 +1,37 @@
-<h3>Add Details</h3>
-<form method="post">
-    {% csrf_token %}
-    <b>{{ form.sex.label }}</b> : {{ form.sex }}
-    <br/><br/>
-    <b>{{ form.phone_number.label }}</b> : {{ form.phone_number }}
-    <br/><br/>
-    <b>{{ form.dl_number.label }}</b> : {{ form.dl_number }}
-    <br/><br/>
-    <b>{{ form.blood_group.label }}</b> : {{ form.blood_group }}
-    <br/><br/>
-    <b>{{ form.employee_number.label }}</b> : {{ form.employee_number }}
-    <br/><br/>
-    <b>{{ form.card_number.label }}</b> : {{ form.card_number }}
-    <br/>
-    <b>{{ error_message }}</b>  {{ form.errors }}
-    <br/>
-    <b>{{ error_message }}</b>
-    <input type="submit" value="Signup" name="signup"/>
-</form>
+{% extends 'base.html' %}
+{% block title %}Add User Details{% endblock %}
+{% block body %}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+        <div class="card card-signin my-5">
+          <div class="card-body">
+            <h5 class="card-title text-center">Add User Details</h5>
+              <form method="post" class="form-signin">
+                  {% csrf_token %}
+                  {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                      {% for error in form.non_field_errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                  {% endif %}
+
+                  {% for field in form.visible_fields %}
+                      <div class="form-label-group">
+                        {{ field }}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {% if field.help_text %}
+                          <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                      </div>
+                  {% endfor %}
+                  <b>{{ error_message }}</b>  {{ form.errors }}
+                  <input type="submit" value="Signup" name="signup"/>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

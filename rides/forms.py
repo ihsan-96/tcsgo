@@ -2,10 +2,26 @@ from django import forms
 from .models import Requests, Groups, Points, Cars, Users
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.forms import AuthenticationForm
+
+
+class CustomLoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Username'})
+        self.fields['password'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Password'})
 
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Username'})
+        self.fields['last_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Last Name'})
+        self.fields['first_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'First Name'})
+        self.fields['email'].widget.attrs.update({'class': 'form-control', 'placeholder': 'E-mail'})
+        self.fields['password'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Password'})
+
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'password']
@@ -17,10 +33,17 @@ class UserForm(forms.ModelForm):
 
 
 class UsersForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['sex'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Sex'})
+        self.fields['phone_number'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Contact Number'})
+        self.fields['dl_number'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Driving License Number'})
+        self.fields['blood_group'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Blood Group'})
+        self.fields['employee_number'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Employee Number'})
+        self.fields['card_number'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Card Number'})
     class Meta:
         model = Users
         fields = ['sex', 'phone_number', 'dl_number', 'blood_group', 'employee_number', 'card_number']
-        widgets = { 'password': forms.PasswordInput() }
         labels = {
             'sex': _('Gender'),
             'phone_number': _('Contact Number'),
@@ -63,6 +86,17 @@ class RequestRideForm(forms.ModelForm):
 
 
 class ConfigureRideForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['start_point'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Start Point'})
+        self.fields['end_point'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Destination'})
+        self.fields['trip1_intermediate_points'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Enroute Intermediate Points'})
+        self.fields['trip2_intermediate_points'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Return Intermediate Points'})
+        self.fields['seats_offered'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Seats Offered'})
+        self.fields['pay_status'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Pay Status'})
+        self.fields['trip1_time'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Enroute Start Time'})
+        self.fields['trip2_time'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Return Start Time'})
+
     class Meta:
         model = Groups
         fields = ['owner', 'car', 'start_point', 'end_point',

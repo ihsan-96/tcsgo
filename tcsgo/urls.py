@@ -6,5 +6,5 @@ from django.conf.urls import url
 urlpatterns = [
     path('', include('rides.urls')),
     path('admin/', admin.site.urls),
-    url('logout', auth_views.logout, {'next_page': 'login'}, name='logout'),
+    url('logout', auth_views.logout, {'next_page': 'rides:login'}, name='logout'),
 ]

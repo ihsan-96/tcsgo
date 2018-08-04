@@ -8,7 +8,7 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
 
     # ex: login/
-    path('login/', views.custom_login, name='login'),
+    path('login', views.custom_login, name='login'),
 
     # ex: /signup/add_details
     path('signup/add_details', views.add_details, name='add_details'),

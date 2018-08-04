@@ -7,13 +7,14 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login
+from .forms import CustomLoginForm
 
 
 def custom_login(request):
     if request.user.is_authenticated:
         return redirect('rides:groups')
     else:
-        return login(request)
+        return login(request, authentication_form=CustomLoginForm)
 
 
 def signup(request):
@@ -95,11 +96,16 @@ def group_member(request, group_id):
         if 'leave_trip' in request.POST:
             if request.POST['member_id']:
                 m = Membership.objects.get(id = request.POST['member_id'])
+                requests = Requests.objects.filter(trip_type=m.trip_type, user_id=m.user_id)
+                for req in requests :
+                    req.request_status='pending'
+                    req.save()
                 m.delete()
+
     user_id = request.user.id
     user = Users.objects.get(user_reference = user_id)
     group = Groups.objects.get(id = group_id)
-    requests = Requests.objects.filter(user_id = user.id)
+    requests = Requests.objects.filter(user_id = user.id, group=group, request_status='pending')
     trip1_members = Membership.objects.filter(group_id=group_id).filter(trip_type=1)
     trip2_members = Membership.objects.filter(group_id=group_id).filter(trip_type=2)
     available_seats_trip1 = group.seats_offered - trip1_members.count()
@@ -165,7 +171,7 @@ def request_ride(request, group_id):
                 context['error_message'] = 'Ride Not Available.'
                 form = RequestRideForm()
                 return render(request, 'rides/request_ride.html', context)
-            elif (post_data['point'] not in trip1_points and post_data['trip_type'][0] == '1' and post_data['point'] != group.start_point.id) or (post_data['point'] not in trip2_points and post_data['trip_type'][0] == '2' and post_data['point'] != group.end_point.id):
+            elif (post_data['point'] not in trip1_points and post_data['trip_type'][0] == '1' and int(post_data['point']) != group.start_point.id) or (post_data['point'] not in trip2_points and post_data['trip_type'][0] == '2' and int(post_data['point']) != group.end_point.id):
                 context['error_message'] = 'This ride is not through your area'
                 form = RequestRideForm()
                 return render(request, 'rides/request_ride.html', context)
@@ -201,12 +207,20 @@ def group_owner(request, group_id):
             trip_type = r.trip_type
             m = Membership.objects.create(trip_type = trip_type, group = g, user = u, point = p)
             r.delete()
+            requests = Requests.objects.filter(trip_type=trip_type, user=u)
+            for req in requests :
+                req.request_status='accepted'
+                req.save()
         if 'remove_member' in request.POST:
             m = Membership.objects.get(id = request.POST['member_id'])
+            requests = Requests.objects.filter(trip_type=m.trip_type, user_id=m.user_id)
+            for req in requests :
+                req.request_status='pending'
+                req.save()
             m.delete()
 
     group = Groups.objects.get(id = group_id)
-    requests = Requests.objects.filter(group_id = group_id)
+    requests = Requests.objects.filter(group_id = group_id).filter(request_status='pending')
     trip1_members = Membership.objects.filter(group_id=group_id).filter(trip_type=1)
     trip2_members = Membership.objects.filter(group_id=group_id).filter(trip_type=2)
     available_seats_trip1 = group.seats_offered - trip1_members.count()

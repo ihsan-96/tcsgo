@@ -86,9 +86,9 @@ class Groups(models.Model):
         return '%s %s - %s' % (self.owner.first_name, self.owner.last_name, self.car.car_name)
 
 request_status_choices = (
-    ('1','pending'),
-    ('2','rejected'),
-    ('3','accepted'),
+    ('pending','pending'),
+    ('ontrip','ontrip'),
+    ('accepted','accepted'),
 )
 
 

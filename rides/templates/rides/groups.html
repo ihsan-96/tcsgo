@@ -75,7 +75,7 @@
     <ul>
     {% for group in groups_owner_list %}
         <!-- <li><a href="{% url 'rides:group_owner' group.id %}">{{ group.owner.first_name }} {{ group.owner.last_name }} - {{ group.car.car_name }}</a></li> -->
-        <div class="w3-container">
+        <div class="container">
         <a href ="{% url 'rides:group_owner' group.id %}" style="text-decoration:none;"><div class="w3-panel w3-card"><p><h3>{{ group.owner.first_name }} {{ group.owner.last_name }}</h3><br/> <p style="text-align:left;">{{ group.car.car_name }}<span style="float:right;">Ratings</span></p><p style="text-align:left;">{{ group.car.car_number }}<span style="float:right;">Reliability</span></p>
         </p></div></a>
         </div>
