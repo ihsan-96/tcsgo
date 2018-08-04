@@ -66,6 +66,12 @@ pay_status_choices =(
     (1,'paid'),
 )
 
+status_choices =(
+    ('idle','idle'),
+    ('trip1','trip1'),
+    ('trip2','trip2')
+)
+
 class Groups(models.Model):
     owner = models.ForeignKey(Users, on_delete=models.CASCADE, related_name='owner')
     car = models.ForeignKey(Cars, on_delete=models.CASCADE)
@@ -78,6 +84,7 @@ class Groups(models.Model):
     trip1_time = models.TimeField(blank=True, default='00:00:00')
     trip2_time = models.TimeField(blank=True, default='00:00:00')
     members = models.ManyToManyField(Users, through='Membership')
+    status = models.CharField(max_length=10, choices=status_choices,default='idle')
 
     class Meta:
         unique_together = ('owner', 'car')
