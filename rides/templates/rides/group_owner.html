@@ -217,7 +217,11 @@
 <form action="{% url 'rides:configure_ride' group.id %}" method="post">
     {% csrf_token %}
     <input type="submit" class="btn btn-primary" value="Configure"/>
-    <input type="submit" class="btn btn-primary" value="Start Ride"/>
+</form>
+<form method="post">
+    {% csrf_token %}
+    <input type='hidden' name="trip_type" value="enroute"/>
+    <input type="submit" class="btn btn-primary" value="Start Ride" name="start_ride"/>
 </form>
 </div>
 </div>
@@ -259,7 +263,11 @@
 <form action="{% url 'rides:configure_ride' group.id %}" method="post">
     {% csrf_token %}
     <input type="submit" class="btn btn-primary" value="Configure"/>
-    <input type="submit" class="btn btn-primary" value="Start Ride"/>
+</form>
+<form method="post">
+    {% csrf_token %}
+    <input type='hidden' name="trip_type" value="return"/>
+    <input type="submit" class="btn btn-primary" value="Start Ride" name="start_ride"/>
 </form>
 </div>
 </div>
