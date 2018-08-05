@@ -1,25 +1,111 @@
-<h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
-<h3>{{ group.car.car_name }}</h3>
-<b>{{ group.car.car_number }}</b>
-<br/>
-<br/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Request Ride</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 
-<form method="post">
-    {% csrf_token %}
-    <b>{{ form.trip_type.label }}</b> : {{ form.trip_type }}
-    <br/>
-    {{ form.trip_type.help_text }}
-    <br/>
-    <br/>
-    <b>{{ form.point.label }}</b> : {{ form.point }}
-    <br/>
-    {{ form.point.help_text }}
-    <br/>
-    <b>{{ error_message }}</b>
-    <br/>
-    <input type="submit" value="Request Ride" name="request"/>
-</form>
-<form method="post">
-    {% csrf_token %}
-    <input type="submit" value="Cancel" name="cancel"/>
-</form>
+  <style>
+.btn {
+  background-color: #0377CE;
+  border: none;
+  text-align: center;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition: 0.3s;
+}
+.btn:hover {
+  background-color: #3680BF;
+  color: white;
+}
+.navbar-inverse .navbar-nav>li>a {
+    color: #fff;
+}
+.navbar-inverse .navbar-brand {
+    color: #fff;
+}
+.jumbotron{
+    position: relative;
+    padding:0 !important;
+    background: #0377CE;
+    color: white;
+    text-align:center;
+    margin-bottom: 0 !important;
+}
+.bg-navbar {
+    background-color: #0377CE;
+}
+</style>
+</head>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-navbar static-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'rides:groups' %}"><b>TcsGO</b></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'rides:groups' %}">My Groups
+                <span class="sr-only">(current)</span>
+              </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'rides:search_ride' %}">Search</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'rides:add_ride' %}">Add Ride</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="row">
+    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+      <div class="card card-signin my-5">
+        <div class="card-body">
+          <h5 class="card-title text-center">{{ group.owner.first_name }} {{ group.owner.last_name }}</h5>
+          <h6 class="card-title text-center">{{ group.car.car_name }}</h6>
+          <h6 class="card-title text-center">{{ group.car.car_number }}</h6>
+          <form class="form-signin" method="post">
+            {% csrf_token %}
+
+            {% for hidden_field in form.hidden_fields %}
+              {{ hidden_field }}
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors %}
+                  {{ error }}
+                  {% endfor %}
+              </div>
+            {% endif %}
+
+            {% for field in form.visible_fields %}
+                <div class="form-label-group">
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+                  <hr>
+                </div>
+            {% endfor %}
+
+            <input class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" value="Request Ride" name="request"/>
+            <input class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" value="Cancel" name="cancel"/>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

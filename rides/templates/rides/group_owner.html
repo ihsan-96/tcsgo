@@ -186,42 +186,51 @@
 <div class="w3-container">
 <b>Ride Availability</b> : {{ trip1_status }}
 <div class="w3-panel w3-card">
-{% if trip1_status == 'Available' %}
-    <b>Starting Point</b> : {{ group.start_point.point_name }} <br/>
-    <b>Starting Time</b> : {{ group.trip1_time }} <br/>
-    <b>Payment Status</b> :
-    {% if group.pay_status == 0 %}
-        No Pay
-    {% else %}
-        paid
-    {% endif %}
-    <br/>
-    <b>Seats Offered</b> : {{ seats_offered }}
-    <br/>
-    <b>Seats Remaining</b> : {{ available_seats_trip1 }}
-    <br/>
-    {% if trip1_members %}
-        <b>Pool members :</b>
+    {% if trip1_status == 'Available' %}
+        <b>Starting Point</b> : {{ group.start_point.point_name }} <br/>
+        <b>Starting Time</b> : {{ group.trip1_time }} <br/>
+        <b>Payment Status</b> :
+        {% if group.pay_status == 0 %}
+            No Pay
+        {% else %}
+            paid
+        {% endif %}
         <br/>
-        {% for member in trip1_members %}
-            <font size ="3"><b>{{ forloop.counter }}. {{member.user.first_name}} {{ member.user.last_name }}</b></font>
-            <form method="post">
-                {% csrf_token %}
-                <input type='hidden' name="member_id" value="{{ member.id }}"/>
-                <input type="submit" class="btn btn-danger" value="Remove" name='remove_member'/>
-            </form>
-        {% endfor %}
+        <b>Seats Offered</b> : {{ seats_offered }}
         <br/>
-    {% endif %}
-{% endif %}
-<form action="{% url 'rides:configure_ride' group.id %}" method="post">
-    {% csrf_token %}
-    <input type="submit" class="btn btn-primary" value="Configure"/>
-</form>
+        <b>Seats Remaining</b> : {{ available_seats_trip1 }}
+        <br/>
+        {% if trip1_members %}
+            <b>Pool members :</b>
+            <br/>
+            {% for member in trip1_members %}
+                <font size ="3"><b>{{ forloop.counter }}. {{member.user.first_name}} {{ member.user.last_name }}</b></font>
+                {% if group.status != 'trip1' %}
+                  <form method="post">
+                      {% csrf_token %}
+                      <input type='hidden' name="member_id" value="{{ member.id }}"/>
+                      <input type="submit" class="btn btn-danger" value="Remove" name='remove_member'/>
+                  </form>
+                {% endif %}
+            {% endfor %}
+            <br/>
+        {% endif %}
+        {% if group.status != 'trip1' %}
+        <form action="{% url 'rides:configure_ride' group.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-primary" value="Configure"/>
+        </form>
+        {% endif %}
+  {% endif %}
 <form method="post">
     {% csrf_token %}
     <input type='hidden' name="trip_type" value="enroute"/>
+    {% if group.status == 'idle' %}
     <input type="submit" class="btn btn-primary" value="Start Ride" name="start_ride"/>
+    {% endif %}
+    {% if group.status == 'trip1' %}
+      <input type="submit" class="btn btn-primary" value="End Ride" name="end_ride"/>
+    {% endif %}
 </form>
 </div>
 </div>
@@ -232,42 +241,49 @@
 <div class="w3-container">
 <b>Ride Availability</b> : {{ trip2_status }}
 <div class="w3-panel w3-card">
-{% if trip2_status == 'Available' %}
-    <b>Destination</b> : {{ group.end_point.point_name }} <br/>
-    <b>Starting Time</b> : {{ group.trip2_time }} <br/>
-    <b>Payment Status</b> :
-    {% if group.pay_status == 0 %}
-        No Pay
-    {% else %}
-        paid
-    {% endif %}
-    <br/>
-    <b>Seats Offered</b> : {{ seats_offered }}
-    <br/>
-    <b>Seats Remaining</b> : {{ available_seats_trip2 }}
-    <br/>
-    {% if trip2_members %}
-        <b>Pool members :</b>
+  {% if group.status != 'trip2' %}
+    {% if trip2_status == 'Available' %}
+        <b>Destination</b> : {{ group.end_point.point_name }} <br/>
+        <b>Starting Time</b> : {{ group.trip2_time }} <br/>
+        <b>Payment Status</b> :
+        {% if group.pay_status == 0 %}
+            No Pay
+        {% else %}
+            paid
+        {% endif %}
         <br/>
-        {% for member in trip2_members %}
-            <font size ="3"><b>{{ forloop.counter }}. {{member.user.first_name}} {{ member.user.last_name }}</b></font>
-            <form method="post">
-                {% csrf_token %}
-                <input type='hidden' name="member_id" value="{{ member.id }}"/>
-                <input type="submit" class="btn btn-danger" value="Remove" name='remove_member'/>
-            </form>
-        {% endfor %}
+        <b>Seats Offered</b> : {{ seats_offered }}
         <br/>
+        <b>Seats Remaining</b> : {{ available_seats_trip2 }}
+        <br/>
+        {% if trip2_members %}
+            <b>Pool members :</b>
+            <br/>
+            {% for member in trip2_members %}
+                <font size ="3"><b>{{ forloop.counter }}. {{member.user.first_name}} {{ member.user.last_name }}</b></font>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type='hidden' name="member_id" value="{{ member.id }}"/>
+                    <input type="submit" class="btn btn-danger" value="Remove" name='remove_member'/>
+                </form>
+            {% endfor %}
+            <br/>
+        {% endif %}
     {% endif %}
-{% endif %}
-<form action="{% url 'rides:configure_ride' group.id %}" method="post">
-    {% csrf_token %}
-    <input type="submit" class="btn btn-primary" value="Configure"/>
-</form>
+    <form action="{% url 'rides:configure_ride' group.id %}" method="post">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-primary" value="Configure"/>
+    </form>
+  {% endif %}
 <form method="post">
     {% csrf_token %}
     <input type='hidden' name="trip_type" value="return"/>
-    <input type="submit" class="btn btn-primary" value="Start Ride" name="start_ride"/>
+    {% if group.status == 'trip2' %}
+      <input type="submit" class="btn btn-primary" value="Start Ride" name="start_ride"/>
+    {% endif %}
+    {% if group.status == 'trip2' %}
+      <input type="submit" class="btn btn-primary" value="End Ride" name="end_ride"/>
+    {% endif %}
 </form>
 </div>
 </div>

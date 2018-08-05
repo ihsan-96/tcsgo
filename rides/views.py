@@ -77,7 +77,10 @@ def groups(request):
     user_id = request.user.id
     user = Users.objects.get(user_reference = user_id)
     groups_history_list = GroupsHistory.objects.filter( members__id=user.id ).order_by('-date').distinct()
+    #ONE GROUP HAVCE DIFFERENT IDS IN HISTORY SO DISTICT SHOWS MULTIPLE ENTRIES
+    #Giving argument for distinct only works in postgreSQL
     groups_owner_list = Groups.objects.filter( owner_id=user.id ).distinct()
+    # groups_active_list = filter from groups where he is a member
     context = {
     'groups_history_list' : groups_history_list,
     'groups_owner_list' : groups_owner_list,
@@ -101,7 +104,8 @@ def group_member(request, group_id):
                     req.request_status='pending'
                     req.save()
                 m.delete()
-
+        if 'join_ride' in request.POST:
+            print("Remove requests of the trip type from all groups")
     user_id = request.user.id
     user = Users.objects.get(user_reference = user_id)
     group = Groups.objects.get(id = group_id)
@@ -167,7 +171,7 @@ def request_ride(request, group_id):
             return redirect('rides:group_member',group_id)
         elif 'request' in request.POST :
             post_data = request.POST.copy()
-            if (post_data['trip_type'][0] == '1' and group.start_point.id == 1) or (post_data['trip_type'][0] == '2' and group.end_point.id == 1) :
+            if (post_data['trip_type'][0] == '1' and group.start_point.id == 1) or (post_data['trip_type'][0] == '2' and group.end_point.id == 1) or (group.status != 'idle'):
                 context['error_message'] = 'Ride Not Available.'
                 form = RequestRideForm()
                 return render(request, 'rides/request_ride.html', context)
@@ -218,7 +222,45 @@ def group_owner(request, group_id):
                 req.request_status='pending'
                 req.save()
             m.delete()
-
+        if 'start_ride' in request.POST:
+            g = Groups.objects.get(id = group_id)
+            if request.POST['trip_type'] == 'enroute' :
+                g.status = 'trip1'
+                requests = Requests.objects.filter(trip_type=1, group_id=group_id)
+            else :
+                g.status = 'trip2'
+                requests = Requests.objects.filter(trip_type=2, group_id=group_id)
+            g.save()
+            for req in requests :
+                req.delete()
+        if 'end_ride' in request.POST:
+            g = Groups.objects.get(id = group_id)
+            print("1")
+            if g.status == 'trip1' :
+                print("2")
+                gh = GroupsHistory.objects.create(group_id = group_id,
+                source = g.start_point,
+                destination_id = 7,
+                pay_status = g.pay_status)
+                #Give Destination value as TCS
+                print("3")
+            if g.status == 'trip2' :
+                gh = GroupsHistory.objects.create(group_id = group_id,
+                source_id = 7,
+                destination = g.end_point,
+                pay_status = g.pay_status)
+                #Give Destination value as TCS
+            print("4")
+            gh.save()
+            print("5")
+            for m in g.members.all():
+                print("looping")
+                gh.members.add(m)#Both trip1 and trip2 members will be added to both histories..!! filter with through model field "trip_type".
+            print("6")
+            g.status = 'idle'
+            g.save()
+            print("7")
+            g.members.clear() #This clears all the members irrspective of trip_type
     group = Groups.objects.get(id = group_id)
     requests = Requests.objects.filter(group_id = group_id).filter(request_status='pending')
     trip1_members = Membership.objects.filter(group_id=group_id).filter(trip_type=1)
@@ -259,13 +301,12 @@ def configure_ride(request, group_id):
             return redirect('rides:group_owner',group_id)
         post_data = request.POST.copy()
         post_data['owner'] = group.owner_id
-        post_data['car'] = group.car_id
+        post_data['car'] = group.car_id     #Add if configure ride disabled ride, remove members and delete requests related to that trip type.
         form_return = ConfigureRideForm(post_data, instance = group)
         print(form_return.is_valid())
         print(form_return.errors)
         if form_return.is_valid():
             form_return.save()
-            print('valid')
             return redirect('rides:group_owner',group_id)
     form = ConfigureRideForm(instance = group)
 

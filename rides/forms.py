@@ -71,6 +71,10 @@ class AddRideForm(forms.ModelForm):
 
 
 class RequestRideForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['point'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Place'})
+        self.fields['trip_type'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Select Ride'})
     class Meta:
         model = Requests
         fields = ['group', 'user', 'point', 'trip_type']

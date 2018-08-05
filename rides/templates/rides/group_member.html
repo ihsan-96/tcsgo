@@ -1,170 +1,3 @@
-<!-- <h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
-<h3>{{ group.car.car_name }}</h3>
-<b>{{ group.car.car_number }}</b>
-<br/>
-<br/>
-
-
-<h2>Your Requests</h2>
-{% if user_id in trip1_members %}
-    <b>You are already a member in this group</b>
-{% else %}
-    {% if requests %}
-        {% for request in requests %}
-            <u><b>{{ forloop.counter }}.)</b>
-            {% if request.trip_type == 1 %}
-                <b>Enroute</b>
-            {% else %}
-                <b>Return</b>
-            {% endif %}
-          </u>
-            <br/>
-            <b>Requested Point : </b> {{ request.point.point_name }}
-            <br/>
-            <b>Starting Time : </b>
-            {% if request.trip_type == 1 %}
-                {{ request.group.trip1_time }}
-            {% else %}
-                {{ request.group.trip2_time }}
-            {% endif %}
-            <br/>
-            <form method="post">
-                {% csrf_token %}
-                <input type='hidden' name="request_id" value="{{ request.id }}"/>
-                <input type="submit" value="Delete" name='delete_request'/>
-            </form>
-            <br/>
-        {% endfor %}
-    {% else %}
-        <b>You haven't requested in this group</b>
-    {% endif %}
-{% endif %}
-
-
-<h2>Enroute</h2>
-{% if user_id in trip1_members_list %}
-    <b>Starting Point</b> : {{ group.end_point.point_name }} <br/>
-    <b>Starting Time</b> : {{ group.trip1_time }}<br/>
-    <b>Payment Status</b> :
-    {% if group.pay_status == 0 %}
-        No Pay
-    {% else %}
-        paid
-    {% endif %}
-    <br/>
-    <form method="post">
-        {% csrf_token %}
-    {% if trip1_members %}
-        <b>You are pooling with :</b>
-        <br/>
-        {% for member in trip1_members %}
-            {% if member.user.id != user_id%}
-                {{member.user.first_name}} {{ member.user.last_name }}
-                <br/>
-            {% else %}
-                <input type='hidden' name="member_id" value="{{ member.id }}"/>
-            {% endif%}
-        {% endfor %}
-        <br/>
-    {% endif %}
-        <input type="submit" value="Leave Group" name='leave_trip'/>
-    </form>
-{% else %}
-    <b>Ride Availability</b> : {{ trip1_status }}
-    <br/>
-    {% if trip1_status == 'Available' %}
-        <b>Starting Point</b> : {{ group.start_point.point_name }} <br/>
-        <b>Starting Time</b> : {{ group.trip1_time }} <br/>
-        <b>Payment Status</b> :
-        {% if group.pay_status == 0 %}
-            No Pay
-        {% else %}
-            paid
-        {% endif %}
-        <br/>
-        <b>Available Seats</b> : {{ available_seats_trip1 }}
-        <br/>
-        {% if trip1_members %}
-            <b>Pooling with :</b>
-            <br/>
-            {% for member in trip1_members %}
-                {% if member.user.id != user_id%}
-                    {{member.user.first_name}} {{ member.user.last_name }}
-                    <br/>
-                {% endif%}
-            {% endfor %}
-            <br/>
-        {% endif %}
-        <form action="{% url 'rides:request_ride' group.id %}" method="post">
-            {% csrf_token %}
-            <input type="submit" value="Request"/>
-        </form>
-    {% endif %}
-{% endif %}
-
-
-<h2>Return</h2>
-{% if user_id in trip2_members_list %}
-    <b>Destination</b> : {{ group.end_point.point_name }} <br/>
-    <b>Starting Time</b> : {{ group.trip2_time }}<br/>
-    <b>Payment Status</b> :
-    {% if group.pay_status == 0 %}
-        No Pay
-    {% else %}
-        paid
-    {% endif %}
-    <br/>
-    <form method="post">
-        {% csrf_token %}
-    {% if trip2_members %}
-        <b>You are pooling with :</b>
-        <br/>
-        {% for member in trip2_members %}
-            {% if member.user.id != user_id%}
-                {{member.user.first_name}} {{ member.user.last_name }}
-                <br/>
-            {% else %}
-                <input type='hidden' name="member_id" value="{{ member.id }}"/>
-            {% endif%}
-        {% endfor %}
-        <br/>
-    {% endif %}
-        <input type="submit" value="Leave Group" name='leave_trip'/>
-    </form>
-{% else %}
-    <b>Ride Availability</b> : {{ trip2_status }}
-    <br/>
-    {% if trip2_status == 'Available' %}
-        <b>Destination</b> : {{ group.end_point.point_name }} <br/>
-        <b>Starting Time</b> : {{ group.trip2_time }} <br/>
-        <b>Payment Status</b> :
-        {% if group.pay_status == 0 %}
-            No Pay
-        {% else %}
-            paid
-        {% endif %}
-        <br/>
-        <b>Available Seats</b> : {{ available_seats_trip2 }}
-        <br/>
-        {% if trip2_members %}
-            <b>Pooling with :</b>
-            <br/>
-            {% for member in trip2_members %}
-                {{member.user.first_name}} {{ member.user.last_name }}
-                <br/>
-            {% endfor %}
-            <br/>
-        {% endif %}
-        <form action="{% url 'rides:request_ride' group.id %}" method="post">
-            {% csrf_token %}
-            <input type="submit" value="Request"/>
-        </form>
-    {% endif %}
-{% endif %} -->
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -462,3 +295,171 @@
 </script>
 </body>
 </html>
+
+
+
+<!-- <h2>{{ group.owner.first_name }} {{ group.owner.last_name }}</h2>
+<h3>{{ group.car.car_name }}</h3>
+<b>{{ group.car.car_number }}</b>
+<br/>
+<br/>
+
+
+<h2>Your Requests</h2>
+{% if user_id in trip1_members %}
+    <b>You are already a member in this group</b>
+{% else %}
+    {% if requests %}
+        {% for request in requests %}
+            <u><b>{{ forloop.counter }}.)</b>
+            {% if request.trip_type == 1 %}
+                <b>Enroute</b>
+            {% else %}
+                <b>Return</b>
+            {% endif %}
+          </u>
+            <br/>
+            <b>Requested Point : </b> {{ request.point.point_name }}
+            <br/>
+
+            <b>Starting Time : </b>
+            {% if request.trip_type == 1 %}
+                {{ request.group.trip1_time }}
+            {% else %}
+                {{ request.group.trip2_time }}
+            {% endif %}
+            <br/>
+            <form method="post">
+                {% csrf_token %}
+
+                <input type='hidden' name="request_id" value="{{ request.id }}"/>
+                <input type="submit" value="Delete" name='delete_request'/>
+            </form>
+            <br/>
+        {% endfor %}
+    {% else %}
+        <b>You haven't requested in this group</b>
+    {% endif %}
+{% endif %}
+
+
+<h2>Enroute</h2>
+{% if user_id in trip1_members_list %}
+    <b>Starting Point</b> : {{ group.end_point.point_name }} <br/>
+    <b>Starting Time</b> : {{ group.trip1_time }}<br/>
+    <b>Payment Status</b> :
+    {% if group.pay_status == 0 %}
+        No Pay
+    {% else %}
+        paid
+    {% endif %}
+    <br/>
+    <form method="post">
+        {% csrf_token %}
+    {% if trip1_members %}
+        <b>You are pooling with :</b>
+        <br/>
+        {% for member in trip1_members %}
+            {% if member.user.id != user_id%}
+                {{member.user.first_name}} {{ member.user.last_name }}
+                <br/>
+            {% else %}
+                <input type='hidden' name="member_id" value="{{ member.id }}"/>
+            {% endif%}
+        {% endfor %}
+        <br/>
+    {% endif %}
+        <input type="submit" value="Leave Group" name='leave_trip'/>
+    </form>
+{% else %}
+    <b>Ride Availability</b> : {{ trip1_status }}
+    <br/>
+    {% if trip1_status == 'Available' %}
+        <b>Starting Point</b> : {{ group.start_point.point_name }} <br/>
+        <b>Starting Time</b> : {{ group.trip1_time }} <br/>
+        <b>Payment Status</b> :
+        {% if group.pay_status == 0 %}
+            No Pay
+        {% else %}
+            paid
+        {% endif %}
+        <br/>
+        <b>Available Seats</b> : {{ available_seats_trip1 }}
+        <br/>
+        {% if trip1_members %}
+            <b>Pooling with :</b>
+            <br/>
+            {% for member in trip1_members %}
+                {% if member.user.id != user_id%}
+                    {{member.user.first_name}} {{ member.user.last_name }}
+                    <br/>
+                {% endif%}
+            {% endfor %}
+            <br/>
+        {% endif %}
+        <form action="{% url 'rides:request_ride' group.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Request"/>
+        </form>
+    {% endif %}
+{% endif %}
+
+
+<h2>Return</h2>
+{% if user_id in trip2_members_list %}
+    <b>Destination</b> : {{ group.end_point.point_name }} <br/>
+    <b>Starting Time</b> : {{ group.trip2_time }}<br/>
+    <b>Payment Status</b> :
+    {% if group.pay_status == 0 %}
+        No Pay
+    {% else %}
+        paid
+    {% endif %}
+    <br/>
+    <form method="post">
+        {% csrf_token %}
+    {% if trip2_members %}
+        <b>You are pooling with :</b>
+        <br/>
+        {% for member in trip2_members %}
+            {% if member.user.id != user_id%}
+                {{member.user.first_name}} {{ member.user.last_name }}
+                <br/>
+            {% else %}
+                <input type='hidden' name="member_id" value="{{ member.id }}"/>
+            {% endif%}
+        {% endfor %}
+        <br/>
+    {% endif %}
+        <input type="submit" value="Leave Group" name='leave_trip'/>
+    </form>
+{% else %}
+    <b>Ride Availability</b> : {{ trip2_status }}
+    <br/>
+    {% if trip2_status == 'Available' %}
+        <b>Destination</b> : {{ group.end_point.point_name }} <br/>
+        <b>Starting Time</b> : {{ group.trip2_time }} <br/>
+        <b>Payment Status</b> :
+        {% if group.pay_status == 0 %}
+            No Pay
+        {% else %}
+            paid
+        {% endif %}
+        <br/>
+        <b>Available Seats</b> : {{ available_seats_trip2 }}
+        <br/>
+        {% if trip2_members %}
+            <b>Pooling with :</b>
+            <br/>
+            {% for member in trip2_members %}
+                {{member.user.first_name}} {{ member.user.last_name }}
+                <br/>
+            {% endfor %}
+            <br/>
+        {% endif %}
+        <form action="{% url 'rides:request_ride' group.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Request"/>
+        </form>
+    {% endif %}
+{% endif %} -->
