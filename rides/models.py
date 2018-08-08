@@ -17,6 +17,13 @@ blood_group_choices = (
     ('7','AB+ve'),
     ('8','AB-ve'),
 )
+
+ride_status_choices = (
+    ('idle','idle'),
+    ('trip1','trip1'),
+    ('trip2','trip2')
+)
+
 class Users(models.Model):
     user_reference = models.IntegerField()
     first_name = models.CharField(max_length=25)
@@ -28,6 +35,7 @@ class Users(models.Model):
     blood_group = models.CharField(max_length=5, choices=blood_group_choices)
     employee_number = models.CharField(max_length=25, unique=True)
     card_number = models.CharField(max_length=25, unique=True)
+    ride_status = models.CharField(max_length=25, choices=ride_status_choices, default='idle')
 
     def __str__(self):
         return '%s %s' % (self.first_name, self.last_name)

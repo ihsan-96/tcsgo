@@ -166,7 +166,15 @@
                       {% endfor %}
                       <br/>
                   {% endif %}
+                  {% if group.status == 'trip1'%}
+                    {% if user.ride_status == 'idle' %}
+                      <input type="submit" class="btn btn-danger" value="Join Ride" name='join_ride'/>
+                    {% else %}
+                      <input type="submit" class="btn btn-danger" value="End Ride" name='end_ride'/>
+                    {% endif %}
+                  {% else %}
                       <input type="submit" class="btn btn-danger" value="Leave Group" name='leave_trip'/>
+                  {% endif %}
                   </form>
               {% else %}
                   <b>Ride Availability</b> : {{ trip1_status }}
@@ -233,7 +241,15 @@
                       {% endfor %}
                       <br/>
                   {% endif %}
+                  {% if group.status == 'trip2' %}
+                    {% if user.ride_status == 'idle' %}
+                      <input type="submit" class="btn btn-danger" value="Join Ride" name='join_ride'/>
+                    {% else %}
+                      <input type="submit" class="btn btn-danger" value="End Ride" name='end_ride'/>
+                    {% endif %}
+                  {% else %}
                       <input type="submit" class="btn btn-danger" value="Leave Group" name='leave_trip'/>
+                  {% endif %}
                   </form>
               {% else %}
                   <b>Ride Availability</b> : {{ trip2_status }}

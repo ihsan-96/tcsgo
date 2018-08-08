@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login
 from .forms import CustomLoginForm
-
+from collections import defaultdict
 
 def custom_login(request):
     if request.user.is_authenticated:
@@ -76,13 +76,21 @@ def add_details(request):
 def groups(request):
     user_id = request.user.id
     user = Users.objects.get(user_reference = user_id)
-    groups_history_list = GroupsHistory.objects.filter( members__id=user.id ).order_by('-date').distinct()
-    #ONE GROUP HAVCE DIFFERENT IDS IN HISTORY SO DISTICT SHOWS MULTIPLE ENTRIES
-    #Giving argument for distinct only works in postgreSQL
+    groups_history_list = GroupsHistory.objects.filter( members__id=user.id ).order_by('-date')
+
+    distinct_groups = defaultdict(int)
+    ghlist = []
+
+    for group_history in groups_history_list:
+        if distinct_groups[group_history.group_id] == 0:
+            ghlist.append(group_history)
+
+        distinct_groups[group_history.group_id] += 1
+
     groups_owner_list = Groups.objects.filter( owner_id=user.id ).distinct()
     # groups_active_list = filter from groups where he is a member
     context = {
-    'groups_history_list' : groups_history_list,
+    'groups_history_list' : ghlist,
     'groups_owner_list' : groups_owner_list,
     'user_id' : user.id
     }
@@ -91,7 +99,10 @@ def groups(request):
 
 @login_required
 def group_member(request, group_id):
-
+    group = Groups.objects.get(id = group_id)
+    error_message = ''
+    user_id = request.user.id
+    user = Users.objects.get(user_reference = user_id)
     if request.method == 'POST':
         if 'delete_request' in request.POST:
             r = Requests.objects.get(id = request.POST['request_id'])
@@ -105,10 +116,32 @@ def group_member(request, group_id):
                     req.save()
                 m.delete()
         if 'join_ride' in request.POST:
-            print("Remove requests of the trip type from all groups")
-    user_id = request.user.id
-    user = Users.objects.get(user_reference = user_id)
-    group = Groups.objects.get(id = group_id)
+            if group.status == 'trip1':
+                trip_type = 1
+                user.ride_status = 'trip1'
+                user.save()
+            elif group.status == 'trip2':
+                trip_type = 1
+                user.ride_status = 'trip2'
+                user.save()
+            else :
+                error_message = "Ride hasn't started."
+            requests = Requests.objects.filter(user_id = user.id, trip_type=trip_type)
+            for req in requests:
+                req.delete()
+        if 'end_ride' in request.POST:
+            if group.status == 'trip1':
+                user.ride_status = 'idle'
+                user.save()
+                m = Membership.objects.get(user=user, group=group, trip_type=1)
+                m.delete()
+            elif group.status == 'trip2':
+                user.ride_status = 'idle'
+                user.save()
+                m = Membership.objects.get(user=user, group=group, trip_type=2)
+                m.delete()
+            else :
+                error_message = "Ride hasn't started."
     requests = Requests.objects.filter(user_id = user.id, group=group, request_status='pending')
     trip1_members = Membership.objects.filter(group_id=group_id).filter(trip_type=1)
     trip2_members = Membership.objects.filter(group_id=group_id).filter(trip_type=2)
@@ -133,6 +166,7 @@ def group_member(request, group_id):
     context = {
     'requests' : requests,
     'group' : group,
+    'user' : user,
     'user_id' : user.id,
     'trip1_status' : trip1_status,
     'trip2_status' : trip2_status,
@@ -141,7 +175,8 @@ def group_member(request, group_id):
     'trip1_members' : trip1_members,
     'trip2_members' : trip2_members,
     'trip1_members_list' : trip1_members_list,
-    'trip2_members_list' : trip2_members_list
+    'trip2_members_list' : trip2_members_list,
+    'error_message' : error_message
     }
     if request.method == 'POST':
         return render(request, 'rides/group_member.html', context)
@@ -199,6 +234,8 @@ def request_ride(request, group_id):
 def group_owner(request, group_id):
     user_id = request.user.id
     user = Users.objects.get(user_reference = user_id)
+    trip1_members = Membership.objects.filter(group_id=group_id).filter(trip_type=1)
+    trip2_members = Membership.objects.filter(group_id=group_id).filter(trip_type=2)
     if request.method == 'POST':
         if 'reject_request' in request.POST:
             r = Requests.objects.get(id = request.POST['request_id'])
@@ -224,47 +261,51 @@ def group_owner(request, group_id):
             m.delete()
         if 'start_ride' in request.POST:
             g = Groups.objects.get(id = group_id)
+            #Change Availability
             if request.POST['trip_type'] == 'enroute' :
+                print(g.status)
                 g.status = 'trip1'
                 requests = Requests.objects.filter(trip_type=1, group_id=group_id)
             else :
                 g.status = 'trip2'
                 requests = Requests.objects.filter(trip_type=2, group_id=group_id)
             g.save()
+
             for req in requests :
                 req.delete()
         if 'end_ride' in request.POST:
             g = Groups.objects.get(id = group_id)
-            print("1")
+            i = Points.objects.get(id = 1)
             if g.status == 'trip1' :
-                print("2")
                 gh = GroupsHistory.objects.create(group_id = group_id,
                 source = g.start_point,
                 destination_id = 7,
                 pay_status = g.pay_status)
                 #Give Destination value as TCS
-                print("3")
+                g.start_point = i
+                for member in trip1_members:
+                    u = member.user
+                    u.ride_status = 'idle'
+                    u.save()
             if g.status == 'trip2' :
                 gh = GroupsHistory.objects.create(group_id = group_id,
                 source_id = 7,
                 destination = g.end_point,
                 pay_status = g.pay_status)
                 #Give Destination value as TCS
-            print("4")
-            gh.save()
-            print("5")
+                g.end_point = i
+                for member in trip2_members:
+                    u = member.user
+                    u.ride_status = 'idle'
+                    u.save()
             for m in g.members.all():
-                print("looping")
-                gh.members.add(m)#Both trip1 and trip2 members will be added to both histories..!! filter with through model field "trip_type".
-            print("6")
+                gh.members.add(m)#Bug-Both trip1 and trip2 members will be added to both histories..!! filter with through model field "trip_type"-bug
             g.status = 'idle'
+            g.members.clear() #Bug-This clears all the members irrspective of trip_type- bug
             g.save()
-            print("7")
-            g.members.clear() #This clears all the members irrspective of trip_type
+            return redirect('rides:group_owner',group_id)
     group = Groups.objects.get(id = group_id)
     requests = Requests.objects.filter(group_id = group_id).filter(request_status='pending')
-    trip1_members = Membership.objects.filter(group_id=group_id).filter(trip_type=1)
-    trip2_members = Membership.objects.filter(group_id=group_id).filter(trip_type=2)
     available_seats_trip1 = group.seats_offered - trip1_members.count()
     available_seats_trip2 = group.seats_offered - trip2_members.count()
     seats_offered = group.seats_offered
@@ -289,8 +330,6 @@ def group_owner(request, group_id):
     'trip2_members' : trip2_members,
     }
 
-    if request.method == 'POST':
-        return render(request, 'rides/group_owner.html', context)
     return render(request, 'rides/group_owner.html', context)
 
 @login_required
@@ -307,6 +346,10 @@ def configure_ride(request, group_id):
         print(form_return.errors)
         if form_return.is_valid():
             form_return.save()
+            if post_data['start_point'] == '1' :
+                group.trip1_intermediate_points.clear()
+            if post_data['end_point'] == '1' :
+                group.trip2_intermediate_points.clear()
             return redirect('rides:group_owner',group_id)
     form = ConfigureRideForm(instance = group)
 
