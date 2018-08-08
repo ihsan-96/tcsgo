@@ -120,16 +120,16 @@
 <head>
   <title>My Groups</title>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 
   <style>
 .btn {
   background-color: #0377CE;
   border: none;
+  color:white;
   text-align: center;
   font-size: 16px;
   margin: 4px 2px;
@@ -145,27 +145,36 @@
 .navbar-inverse .navbar-brand {
     color: #fff;
 }
+.bg-navbar {
+    background-color: #0377CE;
+}
 </style>
 </head>
 <body>
 
-<nav class="navbar navbar-inverse" style="background-color :#0377CE;border : none; ">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand btn"  href="{% url 'rides:groups' %}"><b>TcsGO</b></a>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar" style="float:right;">
-      <ul class="nav navbar-nav">
-        <li class="btn" ><a href="{% url 'rides:search_ride' %}">Search</a></li>
-        <li class="btn"><a href="{% url 'rides:add_ride' %}">Add Ride</a></li>
-        <li class="btn"><a href="{% url 'logout' %}">Logout</a></li>
+<nav class="navbar navbar-expand-lg navbar-dark bg-navbar static-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'rides:groups' %}"><b>TcsGO</b></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'rides:groups' %}">My Groups
+                <span class="sr-only">(current)</span>
+              </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'rides:search_ride' %}">Search</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'rides:add_ride' %}">Add Ride</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+        </li>
       </ul>
-
     </div>
   </div>
 </nav>
@@ -175,6 +184,7 @@
 <b>{{ group.car.car_name }}</b>
 <br/>
 <b>{{ group.car.car_number }}</b>
+<br/>
 <br/>
 <div class="w3-bar" style="background-color :#0377CE; margin-top: -1%; padding-top: 0;" >
   <button class="btn" onclick="displayChhoice('Enroute')">Enroute</button>
